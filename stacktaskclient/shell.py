@@ -277,23 +277,22 @@ class StacktaskShell(object):
                                    "Defaults to %(value)s.") %
                                   {'value': 'env[OS_NO_CLIENT_AUTH]'}))
 
-        parser.add_argument('--stacktask-url',
-                            default=utils.env('STACKTASK_URL'),
+        parser.add_argument('--bypass-url',
+                            default=utils.env('STACKTASK_BYPASS_URL'),
                             help=_('Defaults to %(value)s.') % {
-                                'value': 'env[STACKTASK_URL]'
+                                'value': 'env[STACKTASK_BYPASS_URL]'
                             })
 
         parser.add_argument('--api-version',
-                            default=utils.env('STACKTASK_API_VERSION', default='1'),
+                            default=utils.env('STACKTASK_API_VERSION',
+                            default='1'),
                             help=_('Defaults to %(value)s or 1.') % {
                                 'value': 'env[STACKTASK_API_VERSION]'
                             })
 
-
         # FIXME(gyee): this method should come from python-keystoneclient.
         # Will refactor this code once it is available.
         # https://bugs.launchpad.net/python-keystoneclient/+bug/1332337
-
         self._append_global_identity_args(parser)
 
         if osprofiler_profiler:
@@ -517,11 +516,11 @@ class StacktaskShell(object):
                                    " env[OS_AUTH_TOKEN]"))
 
         if args.os_no_client_auth:
-            if not args.heat_url:
+            if not args.bypass_url:
                 raise exc.CommandError(_("If you specify --os-no-client-auth"
-                                       " you must also specify a Heat API URL"
-                                       " via either --heat-url or"
-                                       " env[HEAT_URL]"))
+                                       " you must also specify a Stacktask API"
+                                       " URL via either --bypass-url or"
+                                       " env[STACKTASK_BYPASS_URL]"))
         else:
             # Tenant/project name or ID is needed to make keystoneclient
             # retrieve a service catalog, it's not required if
@@ -552,7 +551,7 @@ class StacktaskShell(object):
             'timeout': args.api_timeout
         }
 
-        endpoint = None  # args.heat_url
+        endpoint = args.bypass_url
         service_type = args.os_service_type or 'registration'
         if args.os_no_client_auth:
             # Do not use session since no_client_auth means using heat to

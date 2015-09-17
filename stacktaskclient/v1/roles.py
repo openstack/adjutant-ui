@@ -12,64 +12,87 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from stacktaskclient.common import utils
-
-import six
 from six.moves.urllib import parse
 
 from stacktaskclient.openstack.common.apiclient import base
+from stacktaskclient import exc
 
 
 class Roles(base.Resource):
-    def __repr__(self):
-        return "<Roles %s>" % self._info
-
-    def create(self, **fields):
-        return self.manager.create(self.identifier, **fields)
-
-    def get(self):
-        # set_loaded() first ... so if we have to bail, we know we tried.
-        self._loaded = True
-        if not hasattr(self.manager, 'get'):
-            return
-
-        new = self.manager.get(self.identifier)
-        if new:
-            self._add_details(new._info)
-
-    @property
-    def action(self):
-        s = self.stack_status
-        # Return everything before the first underscore
-        return s[:s.index('_')]
-
-    @property
-    def status(self):
-        s = self.stack_status
-        # Return everything after the first underscore
-        return s[s.index('_') + 1:]
-
-    @property
-    def identifier(self):
-        return '%s/%s' % (self.stack_name, self.id)
+    pass
 
 
-class RolesManager(base.BaseManager):
-    resource_class = Roles
+class ManagableRoles(base.Resource):
+    pass
+
+
+class ManagedRolesManager(base.ManagerWithFind):
+    resource_class = ManagableRoles
 
     def list(self, **kwargs):
         """Get a list of roles that can be managed.
 
-        :param limit: maximum number of stacks to return
-        :param marker: begin returning stacks that appear later in the stack
-                       list than that represented by this stack id
-        :param filters: dict of direct comparison filters that mimics the
-                        structure of a stack object
         :rtype: list of :class:`Users`
         """
         params = {}
-        #import pdb; pdb.set_trace()
-        url = '/roles?%(params)s' % {'params': parse.urlencode(params, True)}
-        roles = self._list(url, 'roles')
+        url = '/openstack/roles?%(params)s' % {'params': parse.urlencode(params, True)}
+        return self._list(url, 'roles')
+
+    def get(self, role_id):
+        """
+        Get a role by role_id
+        """
+        # Right now the only way is to list them all, then iterate.
+        # Perhaps a filter or new endpoint would be useful here.
+        roles = self.list()
         for role in roles:
-            yield role
+            if role.id == role_id:
+                return role
+        raise exc.NotFound()
+
+
+class UserRolesManager(base.BaseManager):
+    resource_class = Roles
+
+    def list(self, **kwargs):
+        """List roles for a given user"""
+        # TODO: Look up user by name/id
+        url = '/openstack/users/%s/roles' % kwargs['user']
+        return self._list(url, 'roles')
+
+    def add(self, user, role, tenant=None):
+        """Add a role to a user"""
+        # TODO: resolve the roles and users into id's
+        #user_id = base.getid(user)
+        user_id = user
+        #role_id = role
+        params = {
+            'roles': [role]
+        }
+
+        route = '/openstack/users/%s/roles'
+        url = route % (user_id)
+        try:
+            self._put(url, json=params, response_key=None)
+        except exc.HTTPBadRequest as e:
+            print e.message
+            return False
+
+        return True
+
+    def remove(self, user_id, role_id, tenant=None):
+        """Remove a role from a user"""
+        # TODO: perhaps support multiple roles?
+        params = {
+            'roles': [role_id]
+        }
+
+        route = '/openstack/users/%s/roles'
+        url = route % (user_id)
+        try:
+            self._delete(url, json=params, response_key=None)
+        except exc.HTTPBadRequest as e:
+            print e.message
+            return False
+
+        return True

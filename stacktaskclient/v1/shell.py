@@ -52,47 +52,143 @@ def _authenticated_fetcher(hc):
     return _do
 
 
-def do_user_tenant_list(hc, args):
+#@utils.arg('--tenant-id', metavar='<tenant>',
+#           help=_('Specify a particular tenant'))
+def do_user_list(hc, args):
     """List all users in tenant"""
     kwargs = {}
-    fields = ['id', 'username', 'email', 'roles']
+    fields = ['id', 'email', 'name', 'roles', 'status']
 
     tenant_users = hc.users.list(**kwargs)
     utils.print_list(tenant_users, fields, sortby_index=1)
 
 
-@utils.arg('--tenant-id', metavar='<tenant>',
-           help=_('Invite to a particular tenant'))
-@utils.arg('--user-email', metavar='<email>',
+@utils.arg('--roles', metavar='<roles>', nargs='+',
+           help=_('Roles to grant to new user'))
+@utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
+           help=_('Invite to a particular tenant id'))
+@utils.arg('email', metavar='<email>',
            help=_('Email address of user to invite'))
-def do_user_tenant_invite(hc, args):
+def do_user_invite_send(hc, args):
     """
       Invites a user to become a member of a tenant.
       User does not need to have an existing openstack account.
     """
-    print("do_user_tenant_invite")
-    pass
+    roles = args.roles or ['Member']
+
+    if args.tenant:
+        tenant_id = args.tenant  # utils.find_resource(hc.tenants, args.tenant).id
+    else:
+        tenant_id = None
+
+    try:
+        hc.users.invite(email=args.email, tenant_id=tenant_id, role_list=roles)
+    except exc.HTTPNotFound as e:
+        print e.message
+        print e
+    except exc.HTTPBadRequest as e:
+        print "400 Bad Request: " + e.message
+        print e
+    else:
+        print "Invitation sent. (todo: print pending users)"
 
 
-@utils.arg('--user', '--user-id', metavar='<user>',
+@utils.arg('token', metavar='<token>',
+           help=_('Token id of the task'))
+def do_token_show(hc, args):
+    """Show details of this token, including the arguments required for submit"""
+    fields = ['required_fields', 'actions']
+    try:
+        tokens = hc.tokens.show(args.token)
+    except exc.HTTPNotFound as e:
+        print e.message
+        print "Requested token was not found."
+    else:
+        utils.print_list(tokens, fields, sortby_index=1)
+
+
+@utils.arg('--all-tenants', help=_('Display tasks from all tenants instead of just current'))
+def do_task_list(hc, args):
+    """
+    Show all pending tasks in the current tenant
+    """
+    fields = ['id', 'task_uuid', 'token_uuid', 'created_on', 'expires']
+    token_list = hc.tokens.list()
+    utils.print_list(token_list, fields)
+
+
+@utils.arg('token', metavar='<token>',
+           help=_('Token id of the task'))
+@utils.arg('--password', metavar='<password>', required=True,
+           help=_('Password of the new user.'))
+def do_token_submit(hc, args):
+    """
+       Submit this token to allow processing of this task.
+       Currently only supports NewUser action, which requires a password
+    """
+    print("do_token_submit")
+    kwargs = {'password': args.password}
+    try:
+        hc.tokens.submit(args.token, kwargs)
+    except exc.HTTPNotFound as e:
+        print e.message
+        print "Requested token was not found."
+    except exc.BadRequest as e:
+        print e.message
+        print "Bad request. Did you omit a required parameter?"
+    else:
+        print "Token submitted."
+
+
+@utils.arg('--user', '--user-id', metavar='<user>', required=True,
            help=_('Name or ID of user.'))
+def do_user_role_list(hc, args):
+    """ List the current roles of a user"""
+    fields = ['id', 'name']
+    user = utils.find_resource(hc.users, args.user)
+    kwargs = {'user': user.id}
+    roles = hc.user_roles.list(**kwargs)
+    utils.print_list(roles, fields, sortby_index=0)
+
+
+@utils.arg('--user', '--user-id', metavar='<user>', required=True,
+           help=_('Name or ID of user.'))
+@utils.arg('--role', '--role-id', metavar='<role>', required=True,
+           help=_('Name or ID of role.'))
 @utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
            help=_('Name or ID of tenant.'))
 def do_user_role_add(hc, args):
     """Add a role to user"""
-    print("do_user_role_add")
-    pass
+    user = utils.find_resource(hc.users, args.user)
+    role = utils.find_resource(hc.managed_roles, args.role)
+    if hc.user_roles.add(user.id, role.name):
+        do_user_role_list(hc, args)
 
 
 @utils.arg('--user', '--user-id', metavar='<user>',
            help=_('Name or ID of user.'))
+@utils.arg('--role', '--role-id', metavar='<role>', required=True,
+           help=_('Name or ID of role.'))
 @utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
            help=_('Name or ID of tenant.'))
-#@utils.arg('--role', keystone )
 def do_user_role_remove(hc, args):
     """Remove a role from a user"""
-    print("do_user_role_remove")
-    pass
+    user = utils.find_resource(hc.users, args.user)
+    role = utils.find_resource(hc.managed_roles, args.role)
+    if hc.user_roles.remove(user.id, role.name):
+        do_user_role_list(hc, args)
+
+#
+#@utils.arg('--user', '--user-id', metavar='<user>', required=True,
+#           help=_('Name or ID of user.'))
+#@utils.arg('--roles', '--role-id', metavar='<roles>', required=True,
+#           help=_('List of role ids'))
+#@utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
+#           help=_('Name or ID of tenant.'))
+#def do_user_role_set(hc, args):
+#    """Set the roles of a user. May be empty"""
+#    print("do_user_role_set")
+#    pass
 
 
 @utils.arg('--tenant', metavar='<tenant>',
@@ -101,70 +197,5 @@ def do_managed_role_list(rc, args):
     """List roles that may be managed in a given tenant"""
     fields = ['id', 'name']
     kwargs = {}
-    #import pdb; pdb.set_trace()
-    roles = rc.roles.list(**kwargs)
+    roles = rc.managed_roles.list(**kwargs)
     utils.print_list(roles, fields, sortby_index=1)
-
-
-#----- ------------ OLD HEAT SHELL COMMANDS -------------------
-
-
-@utils.arg('-s', '--show-deleted', default=False, action="store_true",
-           help=_('Include soft-deleted stacks in the stack listing.'))
-@utils.arg('-n', '--show-nested', default=False, action="store_true",
-           help=_('Include nested stacks in the stack listing.'))
-@utils.arg('-a', '--show-hidden', default=False, action="store_true",
-           help=_('Include hidden stacks in the stack listing.'))
-@utils.arg('-f', '--filters', metavar='<KEY1=VALUE1;KEY2=VALUE2...>',
-           help=_('Filter parameters to apply on returned stacks. '
-           'This can be specified multiple times, or once with parameters '
-           'separated by a semicolon.'),
-           action='append')
-@utils.arg('-t', '--tags', metavar='<TAG1,TAG2...>',
-           help=_('Show stacks containing these tags, combine multiple tags '
-                  'using the boolean AND expression'))
-@utils.arg('--tags-any', metavar='<TAG1,TAG2...>',
-           help=_('Show stacks containing these tags, combine multiple tags '
-                  'using the boolean OR expression'))
-@utils.arg('--not-tags', metavar='<TAG1,TAG2...>',
-           help=_('Show stacks not containing these tags, combine multiple '
-                  'tags using the boolean AND expression'))
-@utils.arg('--not-tags-any', metavar='<TAG1,TAG2...>',
-           help=_('Show stacks not containing these tags, combine multiple '
-                  'tags using the boolean OR expression'))
-@utils.arg('-l', '--limit', metavar='<LIMIT>',
-           help=_('Limit the number of stacks returned.'))
-@utils.arg('-m', '--marker', metavar='<ID>',
-           help=_('Only return stacks that appear after the given stack ID.'))
-@utils.arg('-g', '--global-tenant', action='store_true', default=False,
-           help=_('Display stacks from all tenants. Operation only authorized '
-                  'for users who match the policy in heat\'s policy.json.'))
-@utils.arg('-o', '--show-owner', action='store_true', default=False,
-           help=_('Display stack owner information. This is automatically '
-                  'enabled when using %(arg)s.') % {'arg': '--global-tenant'})
-def do_stack_list(hc, args=None):
-    '''List the user's stacks.'''
-    kwargs = {}
-    fields = ['id', 'username', 'email', 'roles']
-    if args:
-        kwargs = {'limit': args.limit,
-                  'marker': args.marker,
-                  'filters': utils.format_parameters(args.filters),
-                  'tags': args.tags,
-                  'tags_any': args.tags_any,
-                  'not_tags': args.not_tags,
-                  'not_tags_any': args.not_tags_any,
-                  'global_tenant': args.global_tenant,
-                  'show_deleted': args.show_deleted,
-                  'show_hidden': args.show_hidden}
-        if args.show_nested:
-            fields.append('parent')
-            kwargs['show_nested'] = True
-
-        if args.global_tenant or args.show_owner:
-            fields.insert(2, 'stack_owner')
-        if args.global_tenant:
-            fields.insert(2, 'project')
-
-    stacks = hc.stacks.list(**kwargs)
-    utils.print_list(stacks, fields, sortby_index=3)

@@ -14,9 +14,9 @@
 #    under the License.
 
 from stacktaskclient.common import http
-#from stacktaskclient.v1 import stacks
 from stacktaskclient.v1 import users
 from stacktaskclient.v1 import roles
+from stacktaskclient.v1 import tokens
 
 
 class Client(object):
@@ -32,20 +32,8 @@ class Client(object):
     def __init__(self, *args, **kwargs):
         """Initialize a new client for the Stacktask v1 API."""
         self.http_client = http._construct_http_client(*args, **kwargs)
-        #self.stacks = stacks.StackManager(self.http_client)
+
         self.users = users.UsersManager(self.http_client)
-        self.roles = roles.RolesManager(self.http_client)
-        #self.resources = resources.ResourceManager(self.http_client)
-        #self.resource_types = resource_types.ResourceTypeManager(
-        #    self.http_client)
-        #self.events = events.EventManager(self.http_client)
-        #self.actions = actions.ActionManager(self.http_client)
-        #self.build_info = build_info.BuildInfoManager(self.http_client)
-        #self.software_deployments = \
-        #    software_deployments.SoftwareDeploymentManager(
-        #        self.http_client)
-        #self.software_configs = software_configs.SoftwareConfigManager(
-        #    self.http_client)
-        #self.services = services.ServiceManager(self.http_client)
-        #self.template_versions = template_versions.TemplateVersionManager(
-        #    self.http_client)
+        self.user_roles = roles.UserRolesManager(self.http_client)
+        self.managed_roles = roles.ManagedRolesManager(self.http_client)
+        self.tokens = tokens.TokenManager(self.http_client)
