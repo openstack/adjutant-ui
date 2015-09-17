@@ -285,7 +285,7 @@ class StacktaskShell(object):
 
         parser.add_argument('--api-version',
                             default=utils.env('STACKTASK_API_VERSION',
-                            default='1'),
+                                              default='1'),
                             help=_('Defaults to %(value)s or 1.') % {
                                 'value': 'env[STACKTASK_API_VERSION]'
                             })

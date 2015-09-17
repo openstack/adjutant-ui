@@ -22,6 +22,7 @@ import six
 from six.moves.urllib import request
 import time
 import yaml
+import json
 
 from stacktaskclient.common import deployment_utils
 from stacktaskclient.common import event_utils
@@ -107,14 +108,14 @@ def do_token_show(hc, args):
         utils.print_list(tokens, fields, sortby_index=1)
 
 
-@utils.arg('--all-tenants', help=_('Display tasks from all tenants instead of just current'))
-def do_task_list(hc, args):
-    """
-    Show all pending tasks in the current tenant
-    """
-    fields = ['id', 'task_uuid', 'token_uuid', 'created_on', 'expires']
-    token_list = hc.tokens.list()
-    utils.print_list(token_list, fields)
+#@utils.arg('--all-tenants', help=_('Display tasks from all tenants instead of just current'))
+#def do_task_list(hc, args):
+#    """
+#    Show all pending tasks in the current tenant
+#    """
+#    fields = ['id', 'task_uuid', 'token_uuid', 'created_on', 'expires']
+#    token_list = hc.tokens.list()
+#    utils.print_list(token_list, fields)
 
 
 @utils.arg('token', metavar='<token>',
@@ -178,6 +179,21 @@ def do_user_role_remove(hc, args):
     if hc.user_roles.remove(user.id, role.name):
         do_user_role_list(hc, args)
 
+
+@utils.arg('email', metavar='<email>',
+           help=_('email of the user account to reset'))
+def do_user_password_forgot(rc, args):
+    """Request a password reset email for a user."""
+    status = rc.http_client.post("/openstack/forgotpassword/")
+
+
+@utils.arg('email', metavar='<email>',
+           help=_('email of the user account to reset'))
+def do_user_password_reset(rc, args):
+    """Force a password reset for a user. This is an admin only function."""
+    print "NOT YET IMPLEMENTED."
+    pass
+
 #
 #@utils.arg('--user', '--user-id', metavar='<user>', required=True,
 #           help=_('Name or ID of user.'))
@@ -199,3 +215,12 @@ def do_managed_role_list(rc, args):
     kwargs = {}
     roles = rc.managed_roles.list(**kwargs)
     utils.print_list(roles, fields, sortby_index=1)
+
+
+def do_status(rc, args):
+    """Requests server status endpoint and returns details of the api server"""
+    status = rc.http_client.get("/status")
+    if status.status_code != 200:
+        print "Failed: %s" % status.reason
+        return
+    print json.dumps(json.loads(status.content), sort_keys=True, indent=4, separators=(',', ': '))

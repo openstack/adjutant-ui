@@ -92,3 +92,10 @@ class UsersManager(base.ManagerWithFind):
             'roles': role_list
         }
         self.client.post('openstack/users', data=fields)
+
+    def password_forgot(self, email):
+        """Forgot password email submission."""
+        params = {"email": email}
+
+        return self.post("openstack/users/password",
+                         params)
