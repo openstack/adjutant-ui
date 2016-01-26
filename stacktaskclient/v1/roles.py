@@ -32,10 +32,12 @@ class ManagedRolesManager(base.ManagerWithFind):
     def list(self, **kwargs):
         """Get a list of roles that can be managed.
 
-        :rtype: list of :class:`Users`
+        :rtype: list of :class:`Roles`
         """
         params = {}
-        url = '/openstack/roles?%(params)s' % {'params': parse.urlencode(params, True)}
+        url = '/openstack/roles?%(params)s' % {
+            'params': parse.urlencode(params, True)
+        }
         return self._list(url, 'roles')
 
     def get(self, role_id):

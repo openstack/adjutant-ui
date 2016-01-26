@@ -17,6 +17,7 @@ from stacktaskclient.common import http
 from stacktaskclient.v1 import users
 from stacktaskclient.v1 import roles
 from stacktaskclient.v1 import tokens
+from stacktaskclient.v1 import tasks
 
 
 class Client(object):
@@ -37,3 +38,4 @@ class Client(object):
         self.user_roles = roles.UserRolesManager(self.http_client)
         self.managed_roles = roles.ManagedRolesManager(self.http_client)
         self.tokens = tokens.TokenManager(self.http_client)
+        self.tasks = tasks.TaskManager(self.http_client)

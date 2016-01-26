@@ -28,3 +28,11 @@ class TokenManager(base.BaseManager):
         url = 'tokens/%s' % token_id
         json = parameters
         return self._post(url, json)
+
+    def reissue(self, task_id):
+        """ Given a task id, reissues the tokens associated with that task """
+        url = 'tokens'
+        json = {
+            'task': task_id
+        }
+        return self._post(url, json)

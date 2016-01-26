@@ -13,27 +13,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import fnmatch
 import logging
 
-from oslo_serialization import jsonutils
-from oslo_utils import strutils
-import six
-from six.moves.urllib import request
-import time
-import yaml
 import json
-
-from stacktaskclient.common import deployment_utils
-from stacktaskclient.common import event_utils
-from stacktaskclient.common import http
-from stacktaskclient.common import template_format
-from stacktaskclient.common import template_utils
 from stacktaskclient.common import utils
 
 from stacktaskclient.openstack.common._i18n import _
-from stacktaskclient.openstack.common._i18n import _LE
-from stacktaskclient.openstack.common._i18n import _LW
 
 import stacktaskclient.exc as exc
 
@@ -70,7 +55,7 @@ def do_user_list(hc, args):
            help=_('Invite to a particular tenant id'))
 @utils.arg('email', metavar='<email>',
            help=_('Email address of user to invite'))
-def do_user_invite_send(hc, args):
+def do_user_invite(hc, args):
     """
       Invites a user to become a member of a tenant.
       User does not need to have an existing openstack account.
@@ -78,7 +63,8 @@ def do_user_invite_send(hc, args):
     roles = args.roles or ['Member']
 
     if args.tenant:
-        tenant_id = args.tenant  # utils.find_resource(hc.tenants, args.tenant).id
+        # utils.find_resource(hc.tenants, args.tenant).id
+        tenant_id = args.tenant
     else:
         tenant_id = None
 
@@ -91,13 +77,51 @@ def do_user_invite_send(hc, args):
         print "400 Bad Request: " + e.message
         print e
     else:
-        print "Invitation sent. (todo: print pending users)"
+        print "Invitation sent. (todo: print only pending users)"
+        do_user_list(hc, args)
+
+
+@utils.arg('--all-tenants',
+           help=_('Display tasks from all tenants instead of just current'))
+def do_task_list(hc, args):
+    """
+    Show all pending tasks in the current tenant
+    """
+    fields = [
+        'uuid', 'task_type', 'created_on',
+        'approved_on', 'completed_on', 'actions', 'action_notes']
+    tasks_list = hc.tasks.list()
+    # split by type, and print with different fields
+    # task_types = {}
+    # for task in task_types:
+    #    task_types[task.task_type] = task
+    utils.print_list(tasks_list, fields)
+
+
+@utils.arg('--task-id', metavar='<taskid>', required=True,
+           help=_('Task ID.'))
+def do_task_reissue_token(hc, args):
+    """
+        Re-issues the token for the provided pending task.
+    """
+    try:
+        resp = hc.tokens.reissue(task_id=args.task_id)
+    except exc.HTTPNotFound as e:
+        print e.message
+    except exc.HTTPBadRequest as e:
+        print e.message
+    else:
+        print 'Success:', ' '.join(resp.notes)
+        do_user_list(hc, args)
 
 
 @utils.arg('token', metavar='<token>',
            help=_('Token id of the task'))
 def do_token_show(hc, args):
-    """Show details of this token, including the arguments required for submit"""
+    """
+        Show details of this token
+        including the arguments required for submit
+    """
     fields = ['required_fields', 'actions']
     try:
         tokens = hc.tokens.show(args.token)
@@ -106,16 +130,6 @@ def do_token_show(hc, args):
         print "Requested token was not found."
     else:
         utils.print_list(tokens, fields, sortby_index=1)
-
-
-#@utils.arg('--all-tenants', help=_('Display tasks from all tenants instead of just current'))
-#def do_task_list(hc, args):
-#    """
-#    Show all pending tasks in the current tenant
-#    """
-#    fields = ['id', 'task_uuid', 'token_uuid', 'created_on', 'expires']
-#    token_list = hc.tokens.list()
-#    utils.print_list(token_list, fields)
 
 
 @utils.arg('token', metavar='<token>',
@@ -184,7 +198,11 @@ def do_user_role_remove(hc, args):
            help=_('email of the user account to reset'))
 def do_user_password_forgot(rc, args):
     """Request a password reset email for a user."""
-    status = rc.http_client.post("/openstack/forgotpassword/")
+    data = {"email": args.email}
+    status = rc.http_client.post("/openstack/forgotpassword/", data=data)
+    if status.status_code != 200:
+        print "Failed: %s" % status.reason
+        return
 
 
 @utils.arg('email', metavar='<email>',
