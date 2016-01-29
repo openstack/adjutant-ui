@@ -1,5 +1,4 @@
-# Copyright 2012 OpenStack Foundation
-# All Rights Reserved.
+# Copyright (C) 2016 Catalyst IT Ltd
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+
 from six.moves.urllib import parse
 
 from stacktaskclient.openstack.common.apiclient import base
@@ -65,9 +65,9 @@ class UserRolesManager(base.BaseManager):
     def add(self, user, role, tenant=None):
         """Add a role to a user"""
         # TODO: resolve the roles and users into id's
-        #user_id = base.getid(user)
+        # user_id = base.getid(user)
         user_id = user
-        #role_id = role
+        # role_id = role
         params = {
             'roles': [role]
         }

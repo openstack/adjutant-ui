@@ -1,5 +1,4 @@
-# Copyright 2012 OpenStack Foundation
-# All Rights Reserved.
+# Copyright (C) 2016 Catalyst IT Ltd
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,7 +11,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from stacktaskclient.common import utils
 
 import six
 from six.moves.urllib import parse
@@ -73,9 +71,9 @@ class UsersManager(base.ManagerWithFind):
                     yield stack
 
         params = {}
-        #if 'filters' in kwargs:
-        #    filters = kwargs.pop('filters')
-        #    params.update(filters)
+        # if 'filters' in kwargs:
+        #     filters = kwargs.pop('filters')
+        #     params.update(filters)
 
         for key, value in six.iteritems(kwargs):
             if value:

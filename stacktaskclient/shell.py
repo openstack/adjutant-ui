@@ -44,192 +44,191 @@ osprofiler_profiler = importutils.try_import("osprofiler.profiler")
 class StacktaskShell(object):
 
     def _append_global_identity_args(self, parser):
-        # FIXME(gyee): these are global identity (Keystone) arguments which
-        # should be consistent and shared by all service clients. Therefore,
-        # they should be provided by python-keystoneclient. We will need to
-        # refactor this code once this functionality is avaible in
-        # python-keystoneclient.
-        parser.add_argument('-k', '--insecure',
-                            default=False,
-                            action='store_true',
-                            help=_('Explicitly allow this client to perform '
-                            '\"insecure SSL\" (https) requests. The server\'s '
-                            'certificate will not be verified against any '
-                            'certificate authorities. This option should '
-                            'be used with caution.'))
+        parser.add_argument(
+            '-k', '--insecure',
+            default=False,
+            action='store_true',
+            help=_(
+                'Explicitly allow this client to perform '
+                '\"insecure SSL\" (https) requests. The server\'s '
+                'certificate will not be verified against any '
+                'certificate authorities. This option should '
+                'be used with caution.'))
 
-        parser.add_argument('--os-cert',
-                            help=_('Path of certificate file to use in SSL '
-                            'connection. This file can optionally be '
-                            'prepended with the private key.'))
+        parser.add_argument(
+            '--os-cert',
+            help=_(
+                'Path of certificate file to use in SSL '
+                'connection. This file can optionally be '
+                'prepended with the private key.'))
 
-        parser.add_argument('--os-key',
-                            help=_('Path of client key to use in SSL '
-                            'connection. This option is not necessary '
-                            'if your key is prepended to your cert file.'))
+        parser.add_argument(
+            '--os-key',
+            help=_(
+                'Path of client key to use in SSL '
+                'connection. This option is not necessary '
+                'if your key is prepended to your cert file.'))
 
-        parser.add_argument('--os-cacert',
-                            metavar='<ca-certificate-file>',
-                            dest='os_cacert',
-                            default=utils.env('OS_CACERT'),
-                            help=_('Path of CA TLS certificate(s) used to '
-                            'verify the remote server\'s certificate. '
-                            'Without this option glance looks for the '
-                            'default system CA certificates.'))
+        parser.add_argument(
+            '--os-cacert',
+            metavar='<ca-certificate-file>',
+            dest='os_cacert',
+            default=utils.env('OS_CACERT'),
+            help=_(
+                'Path of CA TLS certificate(s) used to '
+                'verify the remote server\'s certificate. '
+                'Without this option glance looks for the '
+                'default system CA certificates.'))
 
-        parser.add_argument('--os-username',
-                            default=utils.env('OS_USERNAME'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_USERNAME]'
-                            })
+        parser.add_argument(
+            '--os-username',
+            default=utils.env('OS_USERNAME'),
+            help=_('Defaults to %(value)s.') % {'value': 'env[OS_USERNAME]'})
 
-        parser.add_argument('--os_username',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_username', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-user-id',
-                            default=utils.env('OS_USER_ID'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_USER_ID]'
-                            })
+        parser.add_argument(
+            '--os-user-id',
+            default=utils.env('OS_USER_ID'),
+            help=_('Defaults to %(value)s.') % {'value': 'env[OS_USER_ID]'})
 
-        parser.add_argument('--os_user_id',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_user_id', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-user-domain-id',
-                            default=utils.env('OS_USER_DOMAIN_ID'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_USER_DOMAIN_ID]'
-                            })
+        parser.add_argument(
+            '--os-user-domain-id',
+            default=utils.env('OS_USER_DOMAIN_ID'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_USER_DOMAIN_ID]'
+            })
 
-        parser.add_argument('--os_user_domain_id',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_user_domain_id', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-user-domain-name',
-                            default=utils.env('OS_USER_DOMAIN_NAME'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_USER_DOMAIN_NAME]'
-                            })
+        parser.add_argument(
+            '--os-user-domain-name',
+            default=utils.env('OS_USER_DOMAIN_NAME'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_USER_DOMAIN_NAME]'
+            })
 
-        parser.add_argument('--os_user_domain_name',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_user_domain_name', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-project-id',
-                            default=utils.env('OS_PROJECT_ID'),
-                            help=(_('Another way to specify tenant ID. '
-                                    'This option is mutually exclusive with '
-                                    '%(arg)s. Defaults to %(value)s.') %
-                                  {
-                                      'arg': '--os-tenant-id',
-                                      'value': 'env[OS_PROJECT_ID]'
-                                  }))
+        parser.add_argument(
+            '--os-project-id',
+            default=utils.env('OS_PROJECT_ID'),
+            help=(
+                _('Another way to specify tenant ID. '
+                  'This option is mutually exclusive with '
+                  '%(arg)s. Defaults to %(value)s.') %
+                {'arg': '--os-tenant-id', 'value': 'env[OS_PROJECT_ID]'}))
 
-        parser.add_argument('--os_project_id',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_project_id', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-project-name',
-                            default=utils.env('OS_PROJECT_NAME'),
-                            help=(_('Another way to specify tenant name. '
-                                    'This option is mutually exclusive with '
-                                    '%(arg)s. Defaults to %(value)s.') %
-                                  {
-                                      'arg': '--os-tenant-name',
-                                      'value': 'env[OS_PROJECT_NAME]'
-                                  }))
+        parser.add_argument(
+            '--os-project-name',
+            default=utils.env('OS_PROJECT_NAME'),
+            help=(
+                _('Another way to specify tenant name. '
+                  'This option is mutually exclusive with '
+                  '%(arg)s. Defaults to %(value)s.') %
+                {'arg': '--os-tenant-name', 'value': 'env[OS_PROJECT_NAME]'}))
 
-        parser.add_argument('--os_project_name',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_project_name', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-project-domain-id',
-                            default=utils.env('OS_PROJECT_DOMAIN_ID'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_PROJECT_DOMAIN_ID]'
-                            })
+        parser.add_argument(
+            '--os-project-domain-id',
+            default=utils.env('OS_PROJECT_DOMAIN_ID'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_PROJECT_DOMAIN_ID]'
+            })
 
-        parser.add_argument('--os_project_domain_id',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_project_domain_id', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-project-domain-name',
-                            default=utils.env('OS_PROJECT_DOMAIN_NAME'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_PROJECT_DOMAIN_NAME]'
-                            })
+        parser.add_argument(
+            '--os-project-domain-name',
+            default=utils.env('OS_PROJECT_DOMAIN_NAME'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_PROJECT_DOMAIN_NAME]'
+            })
 
-        parser.add_argument('--os_project_domain_name',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_project_domain_name', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-password',
-                            default=utils.env('OS_PASSWORD'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_PASSWORD]'
-                            })
+        parser.add_argument(
+            '--os-password',
+            default=utils.env('OS_PASSWORD'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_PASSWORD]'
+            })
 
-        parser.add_argument('--os_password',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_password', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-tenant-id',
-                            default=utils.env('OS_TENANT_ID'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_TENANT_ID]'
-                            })
+        parser.add_argument(
+            '--os-tenant-id',
+            default=utils.env('OS_TENANT_ID'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_TENANT_ID]'
+            })
 
-        parser.add_argument('--os_tenant_id',
-                            default=utils.env('OS_TENANT_ID'),
-                            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os_tenant_id',
+            default=utils.env('OS_TENANT_ID'),
+            help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-tenant-name',
-                            default=utils.env('OS_TENANT_NAME'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_TENANT_NAME]'
-                            })
+        parser.add_argument(
+            '--os-tenant-name',
+            default=utils.env('OS_TENANT_NAME'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_TENANT_NAME]'
+            })
 
-        parser.add_argument('--os_tenant_name',
-                            default=utils.env('OS_TENANT_NAME'),
-                            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os_tenant_name',
+            default=utils.env('OS_TENANT_NAME'),
+            help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-auth-url',
-                            default=utils.env('OS_AUTH_URL'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_AUTH_URL]'
-                            })
+        parser.add_argument(
+            '--os-auth-url',
+            default=utils.env('OS_AUTH_URL'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_AUTH_URL]'
+            })
 
-        parser.add_argument('--os_auth_url',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_auth_url', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-region-name',
-                            default=utils.env('OS_REGION_NAME'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_REGION_NAME]'
-                            })
+        parser.add_argument(
+            '--os-region-name',
+            default=utils.env('OS_REGION_NAME'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_REGION_NAME]'
+            })
 
-        parser.add_argument('--os_region_name',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_region_name', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-auth-token',
-                            default=utils.env('OS_AUTH_TOKEN'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_AUTH_TOKEN]'
-                            })
+        parser.add_argument(
+            '--os-auth-token',
+            default=utils.env('OS_AUTH_TOKEN'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_AUTH_TOKEN]'
+            })
 
-        parser.add_argument('--os_auth_token',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_auth_token', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-service-type',
-                            default=utils.env('OS_SERVICE_TYPE'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_SERVICE_TYPE]'
-                            })
+        parser.add_argument(
+            '--os-service-type',
+            default=utils.env('OS_SERVICE_TYPE'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_SERVICE_TYPE]'
+            })
 
-        parser.add_argument('--os_service_type',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_service_type', help=argparse.SUPPRESS)
 
-        parser.add_argument('--os-endpoint-type',
-                            default=utils.env('OS_ENDPOINT_TYPE'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[OS_ENDPOINT_TYPE]'
-                            })
+        parser.add_argument(
+            '--os-endpoint-type',
+            default=utils.env('OS_ENDPOINT_TYPE'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[OS_ENDPOINT_TYPE]'
+            })
 
-        parser.add_argument('--os_endpoint_type',
-                            help=argparse.SUPPRESS)
+        parser.add_argument('--os_endpoint_type', help=argparse.SUPPRESS)
 
     def get_base_parser(self):
         parser = argparse.ArgumentParser(
@@ -243,70 +242,74 @@ class StacktaskShell(object):
         )
 
         # Global arguments
-        parser.add_argument('-h', '--help',
-                            action='store_true',
-                            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '-h', '--help', action='store_true', help=argparse.SUPPRESS)
 
-        parser.add_argument('--version',
-                            action='version',
-                            version=stacktaskclient.__version__,
-                            help=_("Shows the client version and exits."))
+        parser.add_argument(
+            '--version', action='version',
+            version=stacktaskclient.__version__,
+            help=_("Shows the client version and exits."))
 
-        parser.add_argument('-d', '--debug',
-                            default=bool(utils.env('STACKTASKCLIENT_DEBUG')),
-                            action='store_true',
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[STACKTASKCLIENT_DEBUG]'
-                            })
+        parser.add_argument(
+            '-d', '--debug',
+            default=bool(utils.env('STACKTASKCLIENT_DEBUG')),
+            action='store_true',
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[STACKTASKCLIENT_DEBUG]'
+            })
 
-        parser.add_argument('-v', '--verbose',
-                            default=False, action="store_true",
-                            help=_("Print more verbose output."))
+        parser.add_argument(
+            '-v', '--verbose',
+            default=False, action="store_true",
+            help=_("Print more verbose output."))
 
-        parser.add_argument('--api-timeout',
-                            help=_('Number of seconds to wait for an '
-                                   'API response, '
-                                   'defaults to system socket timeout'))
+        parser.add_argument(
+            '--api-timeout',
+            help=_('Number of seconds to wait for an '
+                   'API response, '
+                   'defaults to system socket timeout'))
 
         # os-no-client-auth tells stacktaskclient to use token, instead of
         # env[OS_AUTH_URL]
-        parser.add_argument('--os-no-client-auth',
-                            default=utils.env('OS_NO_CLIENT_AUTH'),
-                            action='store_true',
-                            help=(_("Do not contact keystone for a token. "
-                                   "Defaults to %(value)s.") %
-                                  {'value': 'env[OS_NO_CLIENT_AUTH]'}))
+        parser.add_argument(
+            '--os-no-client-auth',
+            default=utils.env('OS_NO_CLIENT_AUTH'),
+            action='store_true',
+            help=(_("Do not contact keystone for a token. "
+                    "Defaults to %(value)s.") %
+                  {'value': 'env[OS_NO_CLIENT_AUTH]'}))
 
-        parser.add_argument('--bypass-url',
-                            default=utils.env('STACKTASK_BYPASS_URL'),
-                            help=_('Defaults to %(value)s.') % {
-                                'value': 'env[STACKTASK_BYPASS_URL]'
-                            })
+        parser.add_argument(
+            '--bypass-url',
+            default=utils.env('STACKTASK_BYPASS_URL'),
+            help=_('Defaults to %(value)s.') % {
+                'value': 'env[STACKTASK_BYPASS_URL]'
+            })
 
-        parser.add_argument('--api-version',
-                            default=utils.env('STACKTASK_API_VERSION',
-                                              default='1'),
-                            help=_('Defaults to %(value)s or 1.') % {
-                                'value': 'env[STACKTASK_API_VERSION]'
-                            })
+        parser.add_argument(
+            '--api-version',
+            default=utils.env('STACKTASK_API_VERSION',
+                              default='1'),
+            help=_('Defaults to %(value)s or 1.') % {
+                'value': 'env[STACKTASK_API_VERSION]'
+            })
 
-        # FIXME(gyee): this method should come from python-keystoneclient.
-        # Will refactor this code once it is available.
-        # https://bugs.launchpad.net/python-keystoneclient/+bug/1332337
         self._append_global_identity_args(parser)
 
         if osprofiler_profiler:
-            parser.add_argument('--profile',
-                                metavar='HMAC_KEY',
-                                help=_('HMAC key to use for encrypting '
-                                'context data for performance profiling of '
-                                'operation. This key should be the value of '
-                                'HMAC key configured in osprofiler middleware '
-                                'in heat, it is specified in the paste '
-                                'configuration (/etc/heat/api-paste.ini). '
-                                'Without the key, profiling will not be '
-                                'triggered even if osprofiler is enabled '
-                                'on server side.'))
+            parser.add_argument(
+                '--profile',
+                metavar='HMAC_KEY',
+                help=_(
+                    'HMAC key to use for encrypting '
+                    'context data for performance profiling of '
+                    'operation. This key should be the value of '
+                    'HMAC key configured in osprofiler middleware '
+                    'in heat, it is specified in the paste '
+                    'configuration (/etc/heat/api-paste.ini). '
+                    'Without the key, profiling will not be '
+                    'triggered even if osprofiler is enabled '
+                    'on server side.'))
         return parser
 
     def get_subcommand_parser(self, version):
@@ -398,18 +401,14 @@ class StacktaskShell(object):
         # first create a Keystone session
         cacert = kwargs.pop('cacert', None)
         cert = kwargs.pop('cert', None)
-        key = kwargs.pop('key', None)
         insecure = kwargs.pop('insecure', False)
         timeout = kwargs.pop('timeout', None)
         verify = kwargs.pop('verify', None)
 
-        # FIXME(gyee): this code should come from keystoneclient
         if verify is None:
             if insecure:
                 verify = False
             else:
-                # TODO(gyee): should we do
-                # stacktaskclient.common.http.get_system_ca_fle()?
                 verify = cacert or True
 
         return kssession.Session(verify=verify, cert=cert, timeout=timeout)
@@ -504,23 +503,26 @@ class StacktaskShell(object):
             return 0
 
         if not args.os_username and not args.os_auth_token:
-            raise exc.CommandError(_("You must provide a username via"
-                                   " either --os-username or env[OS_USERNAME]"
-                                   " or a token via --os-auth-token or"
-                                   " env[OS_AUTH_TOKEN]"))
+            raise exc.CommandError(
+                _("You must provide a username via"
+                  " either --os-username or env[OS_USERNAME]"
+                  " or a token via --os-auth-token or"
+                  " env[OS_AUTH_TOKEN]"))
 
         if not args.os_password and not args.os_auth_token:
-            raise exc.CommandError(_("You must provide a password via"
-                                   " either --os-password or env[OS_PASSWORD]"
-                                   " or a token via --os-auth-token or"
-                                   " env[OS_AUTH_TOKEN]"))
+            raise exc.CommandError(
+                _("You must provide a password via"
+                  " either --os-password or env[OS_PASSWORD]"
+                  " or a token via --os-auth-token or"
+                  " env[OS_AUTH_TOKEN]"))
 
         if args.os_no_client_auth:
             if not args.bypass_url:
-                raise exc.CommandError(_("If you specify --os-no-client-auth"
-                                       " you must also specify a Stacktask API"
-                                       " URL via either --bypass-url or"
-                                       " env[STACKTASK_BYPASS_URL]"))
+                raise exc.CommandError(
+                    _("If you specify --os-no-client-auth"
+                      " you must also specify a Stacktask API"
+                      " URL via either --bypass-url or"
+                      " env[STACKTASK_BYPASS_URL]"))
         else:
             # Tenant/project name or ID is needed to make keystoneclient
             # retrieve a service catalog, it's not required if
@@ -528,20 +530,22 @@ class StacktaskShell(object):
 
             if not (args.os_tenant_id or args.os_tenant_name or
                     args.os_project_id or args.os_project_name):
-                raise exc.CommandError(_("You must provide a tenant id via"
-                                       " either --os-tenant-id or"
-                                       " env[OS_TENANT_ID] or a tenant name"
-                                       " via either --os-tenant-name or"
-                                       " env[OS_TENANT_NAME] or a project id"
-                                       " via either --os-project-id or"
-                                       " env[OS_PROJECT_ID] or a project"
-                                       " name via either --os-project-name or"
-                                       " env[OS_PROJECT_NAME]"))
+                raise exc.CommandError(
+                    _("You must provide a tenant id via"
+                      " either --os-tenant-id or"
+                      " env[OS_TENANT_ID] or a tenant name"
+                      " via either --os-tenant-name or"
+                      " env[OS_TENANT_NAME] or a project id"
+                      " via either --os-project-id or"
+                      " env[OS_PROJECT_ID] or a project"
+                      " name via either --os-project-name or"
+                      " env[OS_PROJECT_NAME]"))
 
             if not args.os_auth_url:
-                raise exc.CommandError(_("You must provide an auth url via"
-                                       " either --os-auth-url or via"
-                                       " env[OS_AUTH_URL]"))
+                raise exc.CommandError(
+                    _("You must provide an auth url via"
+                      " either --os-auth-url or via"
+                      " env[OS_AUTH_URL]"))
 
         kwargs = {
             'insecure': args.insecure,

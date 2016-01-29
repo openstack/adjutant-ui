@@ -1,5 +1,4 @@
-# Copyright 2012 OpenStack Foundation
-# All Rights Reserved.
+# Copyright (C) 2016 Catalyst IT Ltd
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -17,6 +16,7 @@ import logging
 
 import json
 from stacktaskclient.common import utils
+from stacktaskclient.common import http
 
 from stacktaskclient.openstack.common._i18n import _
 
@@ -38,8 +38,8 @@ def _authenticated_fetcher(hc):
     return _do
 
 
-#@utils.arg('--tenant-id', metavar='<tenant>',
-#           help=_('Specify a particular tenant'))
+# @utils.arg('--tenant-id', metavar='<tenant>',
+#            help=_('Specify a particular tenant'))
 def do_user_list(hc, args):
     """List all users in tenant"""
     kwargs = {}
@@ -212,17 +212,17 @@ def do_user_password_reset(rc, args):
     print "NOT YET IMPLEMENTED."
     pass
 
-#
-#@utils.arg('--user', '--user-id', metavar='<user>', required=True,
-#           help=_('Name or ID of user.'))
-#@utils.arg('--roles', '--role-id', metavar='<roles>', required=True,
-#           help=_('List of role ids'))
-#@utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
-#           help=_('Name or ID of tenant.'))
-#def do_user_role_set(hc, args):
-#    """Set the roles of a user. May be empty"""
-#    print("do_user_role_set")
-#    pass
+
+# @utils.arg('--user', '--user-id', metavar='<user>', required=True,
+#            help=_('Name or ID of user.'))
+# @utils.arg('--roles', '--role-id', metavar='<roles>', required=True,
+#            help=_('List of role ids'))
+# @utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
+#            help=_('Name or ID of tenant.'))
+# def do_user_role_set(hc, args):
+#     """Set the roles of a user. May be empty"""
+#     print("do_user_role_set")
+#     pass
 
 
 @utils.arg('--tenant', metavar='<tenant>',
@@ -241,4 +241,6 @@ def do_status(rc, args):
     if status.status_code != 200:
         print "Failed: %s" % status.reason
         return
-    print json.dumps(json.loads(status.content), sort_keys=True, indent=4, separators=(',', ': '))
+    print json.dumps(
+        json.loads(status.content), sort_keys=True,
+        indent=4, separators=(',', ': '))

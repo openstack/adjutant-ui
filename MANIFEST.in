@@ -1,10 +1,5 @@
 include AUTHORS
 include babel.cfg
 include LICENSE
-include README.rst
+include README.md
 include ChangeLog
-include tox.ini
-include .testr.conf
-recursive-include doc *
-recursive-include tools *
-recursive-include python-stacktaskclient *.po *.pot
