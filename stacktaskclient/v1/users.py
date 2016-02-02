@@ -18,9 +18,9 @@ from six.moves.urllib import parse
 from stacktaskclient.openstack.common.apiclient import base
 
 
-class Users(base.Resource):
+class User(base.Resource):
     def __repr__(self):
-        return "<Users %s>" % self._info
+        return "<User %s>" % self._info
 
     def invite(self, **fields):
         return self.manager.create(self.identifier, **fields)
@@ -40,8 +40,8 @@ class Users(base.Resource):
         return '%s/%s' % (self.stack_name, self.id)
 
 
-class UsersManager(base.ManagerWithFind):
-    resource_class = Users
+class UserManager(base.ManagerWithFind):
+    resource_class = User
 
     def get(self, user):
         return self._get("/openstack/users/%s" % base.getid(user))
@@ -52,7 +52,7 @@ class UsersManager(base.ManagerWithFind):
         :param limit: maximum number of users to return
         :param marker: begin returning users that appear later in the user
                        list than that represented by this user id
-        :rtype: list of :class:`Users`
+        :rtype: list of :class:`User`
         """
         def paginate(params):
             '''Paginate users, even if more than API limit.'''
@@ -81,13 +81,12 @@ class UsersManager(base.ManagerWithFind):
 
         return paginate(params)
 
-    def invite(self, username, email, role_list, tenant_id=None):
-        """ Invite a user to the current tenant. """
+    def invite(self, username, email, role_list):
+        """ Invite a user to the current project. """
 
         fields = {
             'username': username,
             'email': email,
-            'project_id': tenant_id,
             'roles': role_list
         }
         self.client.post('openstack/users', data=fields)

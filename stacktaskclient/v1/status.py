@@ -19,5 +19,4 @@ class StatusManager(base.BaseManager):
 
     def get(self):
         url = '/status'
-        body = self.client.get(url).json()
-        return body
+        return self.client.get(url)

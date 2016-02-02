@@ -24,7 +24,7 @@ class Task(base.Resource):
 class TaskManager(base.ManagerWithFind):
     resource_class = Task
 
-    def show(self, task_id):
+    def get(self, task_id):
         return self._get("/tasks/%s" % base.getid(task_id))
 
     def list(self, filters, **kwargs):

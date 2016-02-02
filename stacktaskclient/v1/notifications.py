@@ -24,7 +24,7 @@ class Notification(base.Resource):
 class NotificationManager(base.ManagerWithFind):
     resource_class = Notification
 
-    def show(self, note_id):
+    def get(self, note_id):
         return self._get("/notifications/%s" % base.getid(note_id))
 
     def list(self, filters, **kwargs):

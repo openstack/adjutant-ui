@@ -18,21 +18,21 @@ from stacktaskclient.openstack.common.apiclient import base
 from stacktaskclient import exc
 
 
-class Roles(base.Resource):
+class Role(base.Resource):
     pass
 
 
-class ManagableRoles(base.Resource):
+class ManagableRole(base.Resource):
     pass
 
 
-class ManagedRolesManager(base.ManagerWithFind):
-    resource_class = ManagableRoles
+class ManagedRoleManager(base.ManagerWithFind):
+    resource_class = ManagableRole
 
     def list(self, **kwargs):
         """Get a list of roles that can be managed.
 
-        :rtype: list of :class:`Roles`
+        :rtype: list of :class:`Role`
         """
         params = {}
         url = '/openstack/roles?%(params)s' % {
@@ -40,7 +40,7 @@ class ManagedRolesManager(base.ManagerWithFind):
         }
         return self._list(url, 'roles')
 
-    def show(self, role_id):
+    def get(self, role_id):
         """
         Get a role by role_id
         """
@@ -53,8 +53,8 @@ class ManagedRolesManager(base.ManagerWithFind):
         raise exc.NotFound()
 
 
-class UserRolesManager(base.BaseManager):
-    resource_class = Roles
+class UserRoleManager(base.BaseManager):
+    resource_class = Role
 
     def list(self, **kwargs):
         """List roles for a given user"""
@@ -62,15 +62,20 @@ class UserRolesManager(base.BaseManager):
         url = '/openstack/users/%s/roles' % kwargs['user']
         return self._list(url, 'roles')
 
-    def add(self, user, role, tenant=None):
+    def add(self, user, role=None, roles=None):
         """Add a role to a user"""
         # TODO: resolve the roles and users into id's
         # user_id = base.getid(user)
         user_id = user
         # role_id = role
-        params = {
-            'roles': [role]
-        }
+        if role:
+            params = {
+                'roles': [role]
+            }
+        elif roles:
+            params = {
+                'roles': roles
+            }
 
         route = '/openstack/users/%s/roles'
         url = route % (user_id)
@@ -82,12 +87,16 @@ class UserRolesManager(base.BaseManager):
 
         return True
 
-    def remove(self, user_id, role_id, tenant=None):
-        """Remove a role from a user"""
-        # TODO: perhaps support multiple roles?
-        params = {
-            'roles': [role_id]
-        }
+    def remove(self, user_id, role=None, roles=None):
+        """Remove a role or roles from a user"""
+        if role:
+            params = {
+                'roles': [role]
+            }
+        elif roles:
+            params = {
+                'roles': roles
+            }
 
         route = '/openstack/users/%s/roles'
         url = route % (user_id)

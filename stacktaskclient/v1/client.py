@@ -35,9 +35,9 @@ class Client(object):
         """Initialize a new client for the Stacktask v1 API."""
         self.http_client = http._construct_http_client(*args, **kwargs)
 
-        self.users = users.UsersManager(self.http_client)
-        self.user_roles = roles.UserRolesManager(self.http_client)
-        self.managed_roles = roles.ManagedRolesManager(self.http_client)
+        self.users = users.UserManager(self.http_client)
+        self.user_roles = roles.UserRoleManager(self.http_client)
+        self.managed_roles = roles.ManagedRoleManager(self.http_client)
         self.tokens = tokens.TokenManager(self.http_client)
         self.tasks = tasks.TaskManager(self.http_client)
         self.notifications = notifications.NotificationManager(

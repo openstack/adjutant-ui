@@ -47,16 +47,12 @@ def do_task_show(sc, args):
     Get individual task.
     """
     try:
-        task = sc.tasks.show(task_id=args.task_id)
+        task = sc.tasks.get(task_id=args.task_id)
 
         formatters = {
-            'uuid': utils.text_wrap_formatter,
-            'task_type': utils.text_wrap_formatter,
-            'created_on': utils.text_wrap_formatter,
-            'approved_on': utils.text_wrap_formatter,
-            'completed_on': utils.text_wrap_formatter,
             'actions': utils.json_formatter,
-            'action_notes': utils.json_formatter
+            'action_notes': utils.json_formatter,
+            'keystone_user': utils.json_formatter
         }
         utils.print_dict(task.to_dict(), formatters=formatters)
     except exc.HTTPNotFound:
@@ -70,7 +66,7 @@ def do_task_show(sc, args):
            help=_('Filters to use when getting the list.'))
 def do_task_list(sc, args):
     """
-    Show all tasks in the current tenant
+    Show all tasks in the current project
     """
     fields = [
         'uuid', 'task_type', 'created_on',
@@ -132,7 +128,24 @@ def do_task_reissue_token(sc, args):
         print e.message
     else:
         print 'Success:', ' '.join(resp.notes)
-        do_user_list(sc, args)
+        do_task_show(sc, args)
+
+
+@utils.arg('task_id', metavar='<taskid>',
+           help=_('Task ID.'))
+def do_task_cancel(sc, args):
+    """
+    Canel the task.
+    """
+    try:
+        resp = sc.tasks.cancel(args.task_id)
+    except exc.HTTPNotFound as e:
+        print e.message
+    except exc.HTTPBadRequest as e:
+        print e.message
+    else:
+        print 'Success: %s' % resp.json()['notes']
+        do_task_show(sc, args)
 
 
 # Notifications
@@ -144,13 +157,10 @@ def do_notification_show(sc, args):
     Get individual notification.
     """
     try:
-        notification = sc.notifications.show(note_id=args.note_id)
+        notification = sc.notifications.get(note_id=args.note_id)
 
         formatters = {
-            'uuid': utils.text_wrap_formatter,
-            'task': utils.text_wrap_formatter,
-            'notes': utils.json_formatter,
-            'created_on': utils.text_wrap_formatter,
+            'notes': utils.json_formatter
         }
         utils.print_dict(notification.to_dict(), formatters=formatters)
     except exc.HTTPNotFound:
@@ -173,14 +183,14 @@ def do_notification_list(sc, args):
     utils.print_list(notification_list, fields)
 
 
-@utils.arg('note_id', metavar='<noteid>',
-           help=_('Notification ID.'))
+@utils.arg('note_ids', metavar='<noteids>', nargs='+',
+           help=_('Notification IDs to acknowledge.'))
 def do_notification_acknowledge(sc, args):
     """
     Acknowledge notification.
     """
     try:
-        resp = sc.notifications.acknowledge(note_id=args.note_id)
+        resp = sc.notifications.acknowledge(note_list=args.note_ids)
 
         print 'Success:', ' '.join(resp.notes)
     except exc.HTTPNotFound:
@@ -213,7 +223,7 @@ def do_token_show(sc, args):
     including the arguments required for submit
     """
     try:
-        token = sc.tokens.show(args.token)
+        token = sc.tokens.get(args.token)
     except exc.HTTPNotFound as e:
         print e.message
         print "Requested Token was not found."
@@ -251,7 +261,7 @@ def do_token_submit(sc, args):
     Submit this token to finalise Task.
     """
     try:
-        sc.tokens.submit(args.token, args.data)
+        sc.tokens.submit(args.token, json.loads(args.data))
     except exc.HTTPNotFound as e:
         print e.message
         print "Requested token was not found."
@@ -260,6 +270,25 @@ def do_token_submit(sc, args):
         print "Bad request. Did you omit a required parameter?"
     else:
         print "Token submitted."
+
+
+def do_token_clear_expired(sc, args):
+    """
+    Clear all expired tokens.
+
+    This is an admin only endpoint.
+    """
+    try:
+        resp = sc.tokens.clear_expired()
+    except exc.HTTPNotFound as e:
+        print e.message
+    except exc.HTTPBadRequest as e:
+        print e.message
+    else:
+        print 'Success: %s' % resp.json()['notes']
+        fields = ['token', 'task', 'created_on', 'expires']
+        token_list = sc.tokens.list({})
+        utils.print_list(token_list, fields)
 
 
 # User
@@ -280,39 +309,30 @@ def do_user_show(sc, args):
 
 
 def do_user_list(sc, args):
-    """List all users in tenant"""
+    """List all users in project"""
     kwargs = {}
     fields = ['id', 'email', 'name', 'roles', 'cohort', 'status']
 
-    tenant_users = sc.users.list(**kwargs)
-    utils.print_list(tenant_users, fields, sortby_index=1)
+    project_users = sc.users.list(**kwargs)
+    utils.print_list(project_users, fields, sortby_index=1)
 
 
 @utils.arg('--roles', metavar='<roles>', nargs='+', required=True,
            help=_('Roles to grant to new user'))
-@utils.arg('--tenant', '--tenant-id', metavar='<tenant>', required=True,
-           help=_('Invite to a particular tenant id'))
-@utils.arg('username', metavar='<username>', default=None,
+@utils.arg('--username', metavar='<username>', default=None,
            help=_('username of user to invite'))
-@utils.arg('email', metavar='<email>',
+@utils.arg('--email', metavar='<email>', required=True,
            help=_('Email address of user to invite'))
 def do_user_invite(sc, args):
     """
-      Invites a user to become a member of a tenant.
+      Invites a user to become a member of a project.
       User does not need to have an existing openstack account.
     """
     roles = args.roles or ['Member']
 
-    if args.tenant:
-        # utils.find_resource(sc.tenants, args.tenant).id
-        tenant_id = args.tenant
-    else:
-        tenant_id = None
-
     try:
         sc.users.invite(
-            username=args.username, email=args.email,
-            tenant_id=tenant_id, role_list=roles)
+            username=args.username, email=args.email, role_list=roles)
     except exc.HTTPNotFound as e:
         print e.message
         print e
@@ -320,7 +340,7 @@ def do_user_invite(sc, args):
         print "400 Bad Request: " + e.message
         print e
     else:
-        print "Invitation sent. (todo: print only pending users)"
+        print "Invitation sent."
         do_user_list(sc, args)
 
 
@@ -353,28 +373,22 @@ def do_user_role_list(sc, args):
            help=_('Name or ID of user.'))
 @utils.arg('--role', '--role-id', metavar='<role>', required=True,
            help=_('Name or ID of role.'))
-@utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
-           help=_('Name or ID of tenant.'))
 def do_user_role_add(sc, args):
     """Add a role to user"""
-    user = utils.find_resource(sc.users, args.user)
     role = utils.find_resource(sc.managed_roles, args.role)
-    if sc.user_roles.add(user.id, role.name):
-        do_user_role_list(sc, args)
+    if sc.user_roles.add(args.user, role=role.name):
+        do_user_list(sc, args)
 
 
 @utils.arg('--user', '--user-id', metavar='<user>',
            help=_('Name or ID of user.'))
 @utils.arg('--role', '--role-id', metavar='<role>', required=True,
            help=_('Name or ID of role.'))
-@utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
-           help=_('Name or ID of tenant.'))
 def do_user_role_remove(sc, args):
     """Remove a role from a user"""
-    user = utils.find_resource(sc.users, args.user)
     role = utils.find_resource(sc.managed_roles, args.role)
-    if sc.user_roles.remove(user.id, role.name):
-        do_user_role_list(sc, args)
+    if sc.user_roles.remove(args.user, role=role.name):
+        do_user_list(sc, args)
 
 
 @utils.arg('email', metavar='<email>',
@@ -392,7 +406,7 @@ def do_user_password_reset(sc, args):
 
 
 def do_managed_role_list(sc, args):
-    """List roles that may be managed in a given tenant"""
+    """List roles that may be managed in a given project"""
     fields = ['id', 'name']
     kwargs = {}
     roles = sc.managed_roles.list(**kwargs)
@@ -404,5 +418,9 @@ def do_managed_role_list(sc, args):
 def do_status(sc, args):
     """Requests server status endpoint and returns details of the api server"""
     status = sc.status.get()
-    print json.dumps(status, sort_keys=True,
-                     indent=4, separators=(',', ': '))
+    if status.status_code != 200:
+        print "Failed: %s" % status.reason
+        return
+    print json.dumps(
+        status.json(), sort_keys=True,
+        indent=4, separators=(',', ': '))

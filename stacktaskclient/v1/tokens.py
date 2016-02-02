@@ -28,7 +28,7 @@ class TokenParam(base.Resource):
 class TokenManager(base.BaseManager):
     resource_class = Token
 
-    def show(self, token_id):
+    def get(self, token_id):
         """Get details on a particular token object"""
         url = 'tokens/%s' % token_id
         return self._get(url)
@@ -46,13 +46,17 @@ class TokenManager(base.BaseManager):
 
     def submit(self, token_id, parameters):
         url = 'tokens/%s' % token_id
-        json = parameters
-        return self._post(url, json)
+        return self._post(url, parameters)
 
     def reissue(self, task_id):
         """ Given a task id, reissues the tokens associated with that task """
         url = 'tokens'
-        json = {
+        data = {
             'task': task_id
         }
-        return self._post(url, json)
+        return self._post(url, data)
+
+    def clear_expired(self):
+        """Clear all expired tokens."""
+        url = '/tokens?'
+        return self._delete(url)

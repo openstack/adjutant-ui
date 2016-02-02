@@ -1,5 +1,4 @@
 include AUTHORS
-include babel.cfg
 include LICENSE
 include README.md
 include ChangeLog
