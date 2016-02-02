@@ -40,7 +40,7 @@ class ManagedRolesManager(base.ManagerWithFind):
         }
         return self._list(url, 'roles')
 
-    def get(self, role_id):
+    def show(self, role_id):
         """
         Get a role by role_id
         """

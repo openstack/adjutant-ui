@@ -14,6 +14,8 @@
 
 from stacktaskclient.openstack.common.apiclient import base
 
+from six.moves.urllib import parse
+
 
 class Token(base.Resource):
     pass
@@ -29,7 +31,18 @@ class TokenManager(base.BaseManager):
     def show(self, token_id):
         """Get details on a particular token object"""
         url = 'tokens/%s' % token_id
-        return [self._get(url)]
+        return self._get(url)
+
+    def list(self, filters, **kwargs):
+        """Get a list of tokens.
+
+        :rtype: list of :class:`Token`
+        """
+        filters = {'filters': filters}
+        url = '/tokens?%(params)s' % {
+            'params': parse.urlencode(filters, True)
+        }
+        return self._list(url, 'tokens')
 
     def submit(self, token_id, parameters):
         url = 'tokens/%s' % token_id

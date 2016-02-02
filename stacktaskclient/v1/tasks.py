@@ -24,17 +24,42 @@ class Task(base.Resource):
 class TaskManager(base.ManagerWithFind):
     resource_class = Task
 
-    def get(self, user):
-        return self._get("/tasks/%s" % base.getid(user))
+    def show(self, task_id):
+        return self._get("/tasks/%s" % base.getid(task_id))
 
-    def list(self, **kwargs):
+    def list(self, filters, **kwargs):
         """Get a list of tasks.
 
         :rtype: list of :class:`Task`
         """
+        filters = {'filters': filters}
 
-        params = {}
         url = '/tasks?%(params)s' % {
-            'params': parse.urlencode(params, True)
+            'params': parse.urlencode(filters, True)
         }
         return self._list(url, 'tasks')
+
+    def update(self, task_id, data):
+        """
+        Update a task with new data and rerun pre-approve validation.
+        """
+        url = 'tasks/%s' % task_id
+        return self._put(url, data)
+
+    def approve(self, task_id):
+        """
+        Approve a task.
+
+        If already approved will rerun post-approve validation
+        and reissue/resend token.
+        """
+        data = {'approved': True}
+        url = 'tasks/%s' % task_id
+        return self._post(url, data)
+
+    def cancel(self, task_id):
+        """
+        Cancel a task.
+        """
+        url = 'tasks/%s' % task_id
+        return self._delete(url)

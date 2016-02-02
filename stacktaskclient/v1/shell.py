@@ -25,126 +25,213 @@ import stacktaskclient.exc as exc
 logger = logging.getLogger(__name__)
 
 
-def _authenticated_fetcher(hc):
+def _authenticated_fetcher(sc):
     """A wrapper around the stacktask client object to fetch a template.
     """
     def _do(*args, **kwargs):
-        if isinstance(hc.http_client, http.SessionClient):
+        if isinstance(sc.http_client, http.SessionClient):
             method, url = args
-            return hc.http_client.request(url, method, **kwargs).content
+            return sc.http_client.request(url, method, **kwargs).content
         else:
-            return hc.http_client.raw_request(*args, **kwargs).content
+            return sc.http_client.raw_request(*args, **kwargs).content
 
     return _do
 
 
-# @utils.arg('--tenant-id', metavar='<tenant>',
-#            help=_('Specify a particular tenant'))
-def do_user_list(hc, args):
-    """List all users in tenant"""
-    kwargs = {}
-    fields = ['id', 'email', 'name', 'roles', 'status']
+# Tasks
 
-    tenant_users = hc.users.list(**kwargs)
-    utils.print_list(tenant_users, fields, sortby_index=1)
-
-
-@utils.arg('--roles', metavar='<roles>', nargs='+',
-           help=_('Roles to grant to new user'))
-@utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
-           help=_('Invite to a particular tenant id'))
-@utils.arg('email', metavar='<email>',
-           help=_('Email address of user to invite'))
-def do_user_invite(hc, args):
+@utils.arg('task_id', metavar='<taskid>',
+           help=_('Task ID.'))
+def do_task_show(sc, args):
     """
-      Invites a user to become a member of a tenant.
-      User does not need to have an existing openstack account.
+    Get individual task.
     """
-    roles = args.roles or ['Member']
-
-    if args.tenant:
-        # utils.find_resource(hc.tenants, args.tenant).id
-        tenant_id = args.tenant
-    else:
-        tenant_id = None
-
     try:
-        hc.users.invite(email=args.email, tenant_id=tenant_id, role_list=roles)
-    except exc.HTTPNotFound as e:
-        print e.message
-        print e
+        task = sc.tasks.show(task_id=args.task_id)
+
+        formatters = {
+            'uuid': utils.text_wrap_formatter,
+            'task_type': utils.text_wrap_formatter,
+            'created_on': utils.text_wrap_formatter,
+            'approved_on': utils.text_wrap_formatter,
+            'completed_on': utils.text_wrap_formatter,
+            'actions': utils.json_formatter,
+            'action_notes': utils.json_formatter
+        }
+        utils.print_dict(task.to_dict(), formatters=formatters)
+    except exc.HTTPNotFound:
+        raise exc.CommandError(_('Task not found: %s') %
+                               args.task_id)
     except exc.HTTPBadRequest as e:
-        print "400 Bad Request: " + e.message
-        print e
-    else:
-        print "Invitation sent. (todo: print only pending users)"
-        do_user_list(hc, args)
+        print e.message
 
 
-@utils.arg('--all-tenants',
-           help=_('Display tasks from all tenants instead of just current'))
-def do_task_list(hc, args):
+@utils.arg('--filters', default={},
+           help=_('Filters to use when getting the list.'))
+def do_task_list(sc, args):
     """
-    Show all pending tasks in the current tenant
+    Show all tasks in the current tenant
     """
     fields = [
         'uuid', 'task_type', 'created_on',
-        'approved_on', 'completed_on', 'actions', 'action_notes']
-    tasks_list = hc.tasks.list()
-    # split by type, and print with different fields
-    # task_types = {}
-    # for task in task_types:
-    #    task_types[task.task_type] = task
+        'approved_on', 'completed_on']
+    tasks_list = sc.tasks.list(args.filters)
     utils.print_list(tasks_list, fields)
 
 
-@utils.arg('--task-id', metavar='<taskid>', required=True,
+@utils.arg('task_id', metavar='<taskid>',
            help=_('Task ID.'))
-def do_task_reissue_token(hc, args):
+@utils.arg('--data', required=True,
+           help=_('New data to update the Task with.'))
+def do_task_update(sc, args):
     """
-        Re-issues the token for the provided pending task.
+    Update a task with new data and rerun pre-approve validation.
     """
     try:
-        resp = hc.tokens.reissue(task_id=args.task_id)
+        resp = sc.tasks.update(args.task_id, args.data)
     except exc.HTTPNotFound as e:
         print e.message
     except exc.HTTPBadRequest as e:
         print e.message
     else:
         print 'Success:', ' '.join(resp.notes)
-        do_user_list(hc, args)
+        do_task_show(sc, args)
+
+
+@utils.arg('task_id', metavar='<taskid>',
+           help=_('Task ID.'))
+def do_task_approve(sc, args):
+    """
+    Approve a task.
+
+    If already approved will rerun post-approve validation
+    and reissue/resend token.
+    """
+    try:
+        resp = sc.tasks.approve(args.task_id)
+    except exc.HTTPNotFound as e:
+        print e.message
+    except exc.HTTPBadRequest as e:
+        print e.message
+    else:
+        print 'Success:', ' '.join(resp.notes)
+        do_task_show(sc, args)
+
+
+@utils.arg('task_id', metavar='<taskid>',
+           help=_('Task ID.'))
+def do_task_reissue_token(sc, args):
+    """
+    Re-issues the token for the provided pending task.
+    """
+    try:
+        resp = sc.tokens.reissue(task_id=args.task_id)
+    except exc.HTTPNotFound as e:
+        print e.message
+    except exc.HTTPBadRequest as e:
+        print e.message
+    else:
+        print 'Success:', ' '.join(resp.notes)
+        do_user_list(sc, args)
+
+
+# Notifications
+
+@utils.arg('note_id', metavar='<noteid>',
+           help=_('Notification ID.'))
+def do_notification_show(sc, args):
+    """
+    Get individual notification.
+    """
+    try:
+        notification = sc.notifications.show(note_id=args.note_id)
+
+        formatters = {
+            'uuid': utils.text_wrap_formatter,
+            'task': utils.text_wrap_formatter,
+            'notes': utils.json_formatter,
+            'created_on': utils.text_wrap_formatter,
+        }
+        utils.print_dict(notification.to_dict(), formatters=formatters)
+    except exc.HTTPNotFound:
+        raise exc.CommandError(_('Notification not found: %s') %
+                               args.note_id)
+    except exc.HTTPBadRequest as e:
+        print e.message
+
+
+@utils.arg('--filters', default={},
+           help=_('Filters to use when getting the list.'))
+def do_notification_list(sc, args):
+    """
+    Show all notification.
+
+    This is an admin only endpoint.
+    """
+    fields = ['uuid', 'task', 'acknowledged', 'created_on']
+    notification_list = sc.notifications.list(args.filters)
+    utils.print_list(notification_list, fields)
+
+
+@utils.arg('note_id', metavar='<noteid>',
+           help=_('Notification ID.'))
+def do_notification_acknowledge(sc, args):
+    """
+    Acknowledge notification.
+    """
+    try:
+        resp = sc.notifications.acknowledge(note_id=args.note_id)
+
+        print 'Success:', ' '.join(resp.notes)
+    except exc.HTTPNotFound:
+        raise exc.CommandError(_('Notification not found: %s') %
+                               args.note_id)
+    except exc.HTTPBadRequest as e:
+        print e.message
+
+
+# Tokens
+
+@utils.arg('--filters', default={},
+           help=_('Filters to use when getting the list.'))
+def do_token_list(sc, args):
+    """
+    Show all tokens.
+
+    This is an admin only endpoint.
+    """
+    fields = ['token', 'task', 'created_on', 'expires']
+    token_list = sc.tokens.list(args.filters)
+    utils.print_list(token_list, fields)
 
 
 @utils.arg('token', metavar='<token>',
            help=_('Token id of the task'))
-def do_token_show(hc, args):
+def do_token_show(sc, args):
     """
-        Show details of this token
-        including the arguments required for submit
+    Show details of this token
+    including the arguments required for submit
     """
-    fields = ['required_fields', 'actions']
     try:
-        tokens = hc.tokens.show(args.token)
+        token = sc.tokens.show(args.token)
     except exc.HTTPNotFound as e:
         print e.message
-        print "Requested token was not found."
+        print "Requested Token was not found."
     else:
-        utils.print_list(tokens, fields, sortby_index=1)
+        utils.print_dict(token.to_dict())
 
 
 @utils.arg('token', metavar='<token>',
            help=_('Token id of the task'))
 @utils.arg('--password', metavar='<password>', required=True,
            help=_('Password of the new user.'))
-def do_token_submit(hc, args):
+def do_token_submit_password(sc, args):
     """
-       Submit this token to allow processing of this task.
-       Currently only supports NewUser action, which requires a password
+    Submit this token to setup or update your password.
     """
-    print("do_token_submit")
     kwargs = {'password': args.password}
     try:
-        hc.tokens.submit(args.token, kwargs)
+        sc.tokens.submit(args.token, kwargs)
     except exc.HTTPNotFound as e:
         print e.message
         print "Requested token was not found."
@@ -155,14 +242,110 @@ def do_token_submit(hc, args):
         print "Token submitted."
 
 
+@utils.arg('token', metavar='<token>',
+           help=_('Token id of the task'))
+@utils.arg('--data', metavar='<data>', required=True,
+           help=_('Json with the data to submit.'))
+def do_token_submit(sc, args):
+    """
+    Submit this token to finalise Task.
+    """
+    try:
+        sc.tokens.submit(args.token, args.data)
+    except exc.HTTPNotFound as e:
+        print e.message
+        print "Requested token was not found."
+    except exc.BadRequest as e:
+        print e.message
+        print "Bad request. Did you omit a required parameter?"
+    else:
+        print "Token submitted."
+
+
+# User
+
+@utils.arg('user_id', metavar='<userid>',
+           help=_('User id.'))
+def do_user_show(sc, args):
+    """
+        Show user details.
+    """
+    try:
+        user = sc.users.get(args.user_id)
+    except exc.HTTPNotFound as e:
+        print e.message
+        print "Requested User was not found."
+    else:
+        utils.print_dict(user.to_dict())
+
+
+def do_user_list(sc, args):
+    """List all users in tenant"""
+    kwargs = {}
+    fields = ['id', 'email', 'name', 'roles', 'status']
+
+    tenant_users = sc.users.list(**kwargs)
+    utils.print_list(tenant_users, fields, sortby_index=1)
+
+
+@utils.arg('--roles', metavar='<roles>', nargs='+', required=True,
+           help=_('Roles to grant to new user'))
+@utils.arg('--tenant', '--tenant-id', metavar='<tenant>', required=True,
+           help=_('Invite to a particular tenant id'))
+@utils.arg('username', metavar='<username>', default=None,
+           help=_('username of user to invite'))
+@utils.arg('email', metavar='<email>',
+           help=_('Email address of user to invite'))
+def do_user_invite(sc, args):
+    """
+      Invites a user to become a member of a tenant.
+      User does not need to have an existing openstack account.
+    """
+    roles = args.roles or ['Member']
+
+    if args.tenant:
+        # utils.find_resource(sc.tenants, args.tenant).id
+        tenant_id = args.tenant
+    else:
+        tenant_id = None
+
+    try:
+        sc.users.invite(
+            username=args.username, email=args.email,
+            tenant_id=tenant_id, role_list=roles)
+    except exc.HTTPNotFound as e:
+        print e.message
+        print e
+    except exc.HTTPBadRequest as e:
+        print "400 Bad Request: " + e.message
+        print e
+    else:
+        print "Invitation sent. (todo: print only pending users)"
+        do_user_list(sc, args)
+
+
+@utils.arg('user_id', metavar='<userid>',
+           help=_('User id for unconfirmed user.'))
+def do_user_invite_cancel(sc, args):
+    """
+    Cancel user details.
+    """
+    try:
+        resp = sc.users.cancel(args.user_id)
+        print 'Success:', ' '.join(resp)
+    except exc.HTTPNotFound as e:
+        print e.message
+        print "Requested User was not found."
+
+
 @utils.arg('--user', '--user-id', metavar='<user>', required=True,
            help=_('Name or ID of user.'))
-def do_user_role_list(hc, args):
+def do_user_role_list(sc, args):
     """ List the current roles of a user"""
     fields = ['id', 'name']
-    user = utils.find_resource(hc.users, args.user)
+    user = utils.find_resource(sc.users, args.user)
     kwargs = {'user': user.id}
-    roles = hc.user_roles.list(**kwargs)
+    roles = sc.user_roles.list(**kwargs)
     utils.print_list(roles, fields, sortby_index=0)
 
 
@@ -172,12 +355,12 @@ def do_user_role_list(hc, args):
            help=_('Name or ID of role.'))
 @utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
            help=_('Name or ID of tenant.'))
-def do_user_role_add(hc, args):
+def do_user_role_add(sc, args):
     """Add a role to user"""
-    user = utils.find_resource(hc.users, args.user)
-    role = utils.find_resource(hc.managed_roles, args.role)
-    if hc.user_roles.add(user.id, role.name):
-        do_user_role_list(hc, args)
+    user = utils.find_resource(sc.users, args.user)
+    role = utils.find_resource(sc.managed_roles, args.role)
+    if sc.user_roles.add(user.id, role.name):
+        do_user_role_list(sc, args)
 
 
 @utils.arg('--user', '--user-id', metavar='<user>',
@@ -186,61 +369,40 @@ def do_user_role_add(hc, args):
            help=_('Name or ID of role.'))
 @utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
            help=_('Name or ID of tenant.'))
-def do_user_role_remove(hc, args):
+def do_user_role_remove(sc, args):
     """Remove a role from a user"""
-    user = utils.find_resource(hc.users, args.user)
-    role = utils.find_resource(hc.managed_roles, args.role)
-    if hc.user_roles.remove(user.id, role.name):
-        do_user_role_list(hc, args)
+    user = utils.find_resource(sc.users, args.user)
+    role = utils.find_resource(sc.managed_roles, args.role)
+    if sc.user_roles.remove(user.id, role.name):
+        do_user_role_list(sc, args)
 
 
 @utils.arg('email', metavar='<email>',
            help=_('email of the user account to reset'))
-def do_user_password_forgot(rc, args):
+def do_user_password_forgot(sc, args):
     """Request a password reset email for a user."""
-    data = {"email": args.email}
-    status = rc.http_client.post("/openstack/forgotpassword/", data=data)
-    if status.status_code != 200:
-        print "Failed: %s" % status.reason
-        return
+    sc.users.password_forgot(args.email)
 
 
 @utils.arg('email', metavar='<email>',
            help=_('email of the user account to reset'))
-def do_user_password_reset(rc, args):
+def do_user_password_reset(sc, args):
     """Force a password reset for a user. This is an admin only function."""
-    print "NOT YET IMPLEMENTED."
-    pass
+    sc.users.password_force_reset(args.email)
 
 
-# @utils.arg('--user', '--user-id', metavar='<user>', required=True,
-#            help=_('Name or ID of user.'))
-# @utils.arg('--roles', '--role-id', metavar='<roles>', required=True,
-#            help=_('List of role ids'))
-# @utils.arg('--tenant', '--tenant-id', metavar='<tenant>',
-#            help=_('Name or ID of tenant.'))
-# def do_user_role_set(hc, args):
-#     """Set the roles of a user. May be empty"""
-#     print("do_user_role_set")
-#     pass
-
-
-@utils.arg('--tenant', metavar='<tenant>',
-           help=_('Name or ID of tenant.'))
-def do_managed_role_list(rc, args):
+def do_managed_role_list(sc, args):
     """List roles that may be managed in a given tenant"""
     fields = ['id', 'name']
     kwargs = {}
-    roles = rc.managed_roles.list(**kwargs)
+    roles = sc.managed_roles.list(**kwargs)
     utils.print_list(roles, fields, sortby_index=1)
 
 
-def do_status(rc, args):
+# Status
+
+def do_status(sc, args):
     """Requests server status endpoint and returns details of the api server"""
-    status = rc.http_client.get("/status")
-    if status.status_code != 200:
-        print "Failed: %s" % status.reason
-        return
-    print json.dumps(
-        json.loads(status.content), sort_keys=True,
-        indent=4, separators=(',', ': '))
+    status = sc.status.get()
+    print json.dumps(status, sort_keys=True,
+                     indent=4, separators=(',', ': '))

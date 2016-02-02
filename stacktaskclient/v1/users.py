@@ -81,19 +81,48 @@ class UsersManager(base.ManagerWithFind):
 
         return paginate(params)
 
-    def invite(self, email, role_list, tenant_id=None):
+    def invite(self, username, email, role_list, tenant_id=None):
         """ Invite a user to the current tenant. """
 
         fields = {
+            'username': username,
             'email': email,
             'project_id': tenant_id,
             'roles': role_list
         }
         self.client.post('openstack/users', data=fields)
 
+    def cancel(self, user_id):
+        """
+        Cancel a user invite task.
+        """
+        url = 'openstack/users/%s' % user_id
+        return self._delete(url)
+
+    def revoke(self, user_id):
+        """
+        revoke all user roles on project.
+        """
+        # NOTE(adriant): This doesn't work yet.
+        # Uses the same endpoint as cancel, but doesn't
+        # yet actually revoke all roles if an actual user
+        # rather than an invite.
+        return self.cancel(user_id)
+
     def password_forgot(self, email):
         """Forgot password email submission."""
         params = {"email": email}
 
-        return self.post("openstack/users/password",
-                         params)
+        return self.client.post("openstack/users/password-reset",
+                                data=params)
+
+    def password_force_reset(self, email):
+        """
+        Force a password reset for a user.
+
+        This is an admin only function.
+        """
+        params = {"email": email}
+
+        return self.client.post("openstack/users/password-set",
+                                data=params)
