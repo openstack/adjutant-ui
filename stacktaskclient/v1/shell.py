@@ -282,7 +282,7 @@ def do_user_show(sc, args):
 def do_user_list(sc, args):
     """List all users in tenant"""
     kwargs = {}
-    fields = ['id', 'email', 'name', 'roles', 'status']
+    fields = ['id', 'email', 'name', 'roles', 'cohort', 'status']
 
     tenant_users = sc.users.list(**kwargs)
     utils.print_list(tenant_users, fields, sortby_index=1)
