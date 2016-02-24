@@ -237,19 +237,10 @@ def do_token_show(sc, args):
            help=_('Password of the new user.'))
 def do_token_submit_password(sc, args):
     """
-    Submit this token to setup or update your password.
+    Submit this token to set or update your password.
     """
-    kwargs = {'password': args.password}
-    try:
-        sc.tokens.submit(args.token, kwargs)
-    except exc.HTTPNotFound as e:
-        print e.message
-        print "Requested token was not found."
-    except exc.BadRequest as e:
-        print e.message
-        print "Bad request. Did you omit a required parameter?"
-    else:
-        print "Token submitted."
+    json_data = {'password': args.password}
+    _token_submit(sc, args, json_data)
 
 
 @utils.arg('token', metavar='<token>',
@@ -261,7 +252,17 @@ def do_token_submit(sc, args):
     Submit this token to finalise Task.
     """
     try:
-        sc.tokens.submit(args.token, json.loads(args.data))
+        json_data = json.loads(args.data)
+    except ValueError as e:
+        print e.message
+        print "Json data invalid."
+        return
+    _token_submit(sc, args, json_data)
+
+
+def _token_submit(sc, args, json_data):
+    try:
+        sc.tokens.submit(args.token, json_data)
     except exc.HTTPNotFound as e:
         print e.message
         print "Requested token was not found."

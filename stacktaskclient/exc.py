@@ -48,8 +48,15 @@ class HTTPException(BaseException):
         super(HTTPException, self).__init__(message)
         try:
             self.error = jsonutils.loads(message)
+            # Stacktask client: mangle the 'errors' return list into
+            # standard 'error' format
+            if 'errors' in self.error:
+                self.error['error'] = {
+                    "message": ', '.join(self.error['errors']),
+                }
+
             if 'error' not in self.error:
-                raise KeyError(_('Key "error" not exists'))
+                raise KeyError(_('Key "error" does not exist.'))
         except KeyError:
             # NOTE(jianingy): If key 'error' happens not exist,
             # self.message becomes no sense. In this case, we
