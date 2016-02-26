@@ -12,7 +12,9 @@ run_tests.err.log
 doc/source/api
 doc/build
 *.egg
+.eggs/*
 stacktaskclient/versioninfo
 *.egg-info
 *.log
 .testrepository
+.pypirc
