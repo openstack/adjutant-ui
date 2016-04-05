@@ -377,7 +377,8 @@ def do_user_role_list(sc, args):
 def do_user_role_add(sc, args):
     """Add a role to user"""
     role = utils.find_resource(sc.managed_roles, args.role)
-    if sc.user_roles.add(args.user, role=role.name):
+    user = utils.find_resource(sc.users, args.user)
+    if sc.user_roles.add(user.id, role=role.name):
         do_user_list(sc, args)
 
 
@@ -388,7 +389,8 @@ def do_user_role_add(sc, args):
 def do_user_role_remove(sc, args):
     """Remove a role from a user"""
     role = utils.find_resource(sc.managed_roles, args.role)
-    if sc.user_roles.remove(args.user, role=role.name):
+    user = utils.find_resource(sc.users, args.user)
+    if sc.user_roles.remove(user.id, role=role.name):
         do_user_list(sc, args)
 
 
