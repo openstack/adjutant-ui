@@ -89,7 +89,7 @@ class UserManager(base.ManagerWithFind):
             'email': email,
             'roles': role_list
         }
-        self.client.post('openstack/users', data=fields)
+        return self.client.post('openstack/users', data=fields)
 
     def cancel(self, user_id):
         """
@@ -122,6 +122,5 @@ class UserManager(base.ManagerWithFind):
         This is an admin only function.
         """
         params = {"email": email}
-
-        return self.client.post("openstack/users/password-set",
-                                data=params)
+        return self.client.post(
+            "openstack/users/password-set", data=params)

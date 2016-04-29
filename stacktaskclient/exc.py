@@ -186,7 +186,10 @@ for obj_name in dir(sys.modules[__name__]):
 def from_response(response):
     """Return an instance of an HTTPException based on requests response."""
     cls = _code_map.get(response.status_code, HTTPException)
-    return cls(response.content)
+    try:
+        return cls(response.json())
+    except ValueError:
+        return cls(response.content)
 
 
 class NoTokenLookupException(Exception):

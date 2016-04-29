@@ -26,7 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 def _authenticated_fetcher(sc):
-    """A wrapper around the stacktask client object to fetch a template.
+    """
+    A wrapper around the stacktask client object to fetch a template.
     """
     def _do(*args, **kwargs):
         if isinstance(sc.http_client, http.SessionClient):
@@ -70,7 +71,7 @@ def do_task_list(sc, args):
     """
     fields = [
         'uuid', 'task_type', 'created_on',
-        'approved_on', 'completed_on']
+        'approved_on', 'completed_on', 'cancelled']
     tasks_list = sc.tasks.list(args.filters)
     utils.print_list(tasks_list, fields)
 
@@ -298,7 +299,7 @@ def do_token_clear_expired(sc, args):
            help=_('User id.'))
 def do_user_show(sc, args):
     """
-        Show user details.
+    Show user details.
     """
     try:
         user = sc.users.get(args.user_id)
@@ -326,8 +327,8 @@ def do_user_list(sc, args):
            help=_('Email address of user to invite'))
 def do_user_invite(sc, args):
     """
-      Invites a user to become a member of a project.
-      User does not need to have an existing openstack account.
+    Invites a user to become a member of a project.
+    User does not need to have an existing openstack account.
     """
     roles = args.roles or ['Member']
 
@@ -353,7 +354,7 @@ def do_user_invite_cancel(sc, args):
     """
     try:
         resp = sc.users.cancel(args.user_id)
-        print 'Success:', ' '.join(resp)
+        print 'Success: %s' % resp.json()
     except exc.HTTPNotFound as e:
         print e.message
         print "Requested User was not found."
@@ -379,7 +380,10 @@ def do_user_role_add(sc, args):
     role = utils.find_resource(sc.managed_roles, args.role)
     user = utils.find_resource(sc.users, args.user)
     if sc.user_roles.add(user.id, role=role.name):
+        print "Task has been sucessfully completed.\n"
         do_user_list(sc, args)
+    else:
+        print "Your task was not sucessfully completed."
 
 
 @utils.arg('--user', '--user-id', metavar='<user>',
@@ -391,7 +395,10 @@ def do_user_role_remove(sc, args):
     role = utils.find_resource(sc.managed_roles, args.role)
     user = utils.find_resource(sc.users, args.user)
     if sc.user_roles.remove(user.id, role=role.name):
+        print "Task has been sucessfully completed.\n"
         do_user_list(sc, args)
+    else:
+        print "Your task was not sucessfully completed."
 
 
 @utils.arg('email', metavar='<email>',
@@ -399,6 +406,8 @@ def do_user_role_remove(sc, args):
 def do_user_password_forgot(sc, args):
     """Request a password reset email for a user."""
     sc.users.password_forgot(args.email)
+    print "Task has been sucessfully submitted."
+    print "If a user with that email exists, a reset token will be issued."
 
 
 @utils.arg('email', metavar='<email>',
@@ -406,6 +415,8 @@ def do_user_password_forgot(sc, args):
 def do_user_password_reset(sc, args):
     """Force a password reset for a user. This is an admin only function."""
     sc.users.password_force_reset(args.email)
+    print "Task has been sucessfully submitted."
+    print "If a user with that email exists, a reset token will be issued."
 
 
 def do_managed_role_list(sc, args):
