@@ -18,3 +18,4 @@ stacktaskclient/versioninfo
 *.log
 .testrepository
 .pypirc
+env/

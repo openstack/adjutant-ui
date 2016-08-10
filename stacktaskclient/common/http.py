@@ -30,7 +30,7 @@ from stacktaskclient.common import utils
 from stacktaskclient import exc
 from stacktaskclient.openstack.common._i18n import _
 from stacktaskclient.openstack.common._i18n import _LW
-from keystoneclient import adapter
+from keystoneauth1 import adapter
 
 LOG = logging.getLogger(__name__)
 USER_AGENT = 'python-stacktaskclient'
