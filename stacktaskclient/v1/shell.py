@@ -53,7 +53,8 @@ def do_task_show(sc, args):
         formatters = {
             'actions': utils.json_formatter,
             'action_notes': utils.json_formatter,
-            'keystone_user': utils.json_formatter
+            'keystone_user': utils.json_formatter,
+            'approved_by': utils.json_formatter
         }
         utils.print_dict(task.to_dict(), formatters=formatters)
     except exc.HTTPNotFound:

@@ -138,7 +138,7 @@ def isunauthenticated(func):
     return getattr(func, 'unauthenticated', False)
 
 
-def print_list(objs, fields, formatters=None, sortby_index=0,
+def print_list(objs, fields, formatters=None, sortby_index=None,
                mixed_case_fields=None, field_labels=None):
     """Print a list or objects as a table, one row per object.
 

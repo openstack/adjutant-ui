@@ -14,10 +14,15 @@
 #    under the License.
 
 import base64
+from fcntl import ioctl
 import logging
 import os
 import textwrap
 import uuid
+import six
+import struct
+import sys
+import termios
 
 from oslo_serialization import jsonutils
 from oslo_utils import importutils
@@ -64,9 +69,26 @@ def resource_nested_identifier(rsrc):
         return "/".join(nested_identifier)
 
 
-def json_formatter(js):
-    return jsonutils.dumps(js, indent=2, ensure_ascii=False,
-                           separators=(', ', ': '))
+def json_formatter(js, wrap=None):
+    value = jsonutils.dumps(js, indent=2, ensure_ascii=False,
+                            separators=(', ', ': '))
+    # as json sort of does it's own line splitting, we have to check
+    # if each line is over the wrap limit, and split ourselves.
+    if wrap:
+        lines = []
+        for line in value.split('\n'):
+            if len(line) > wrap:
+                lines.append(line[0:wrap-1])
+                line = line[wrap:]
+                while line:
+                    lines.append(line[0:wrap-1])
+                    line = line[wrap:]
+            else:
+                lines.append(line)
+        value = ""
+        for line in lines:
+            value += "%s\n" % line
+    return value
 
 
 def text_wrap_formatter(d):
@@ -77,7 +99,22 @@ def newline_list_formatter(r):
     return '\n'.join(r or [])
 
 
-def print_dict(d, formatters=None):
+def print_dict(d, formatters=None, wrap=None):
+    if not wrap:
+        # 2 columns padded by 1 on each side = 4
+        # 3 x '|' as border and separator = 3
+        # total non-content padding = 7
+        padding = 7
+        # Now we need to find what the longest key is
+        longest_key = 0
+        for key in d.keys():
+            if len(key) > longest_key:
+                longest_key = len(key)
+        # the wrap for the value column is based on
+        # what is left after we account for the padding
+        # and longest key
+        wrap = terminal_width() - padding - longest_key
+
     formatters = formatters or {}
     pt = prettytable.PrettyTable(['Property', 'Value'],
                                  caching=False, print_empty=False)
@@ -85,9 +122,11 @@ def print_dict(d, formatters=None):
 
     for field in d.keys():
         if field in formatters:
-            pt.add_row([field, formatters[field](d[field])])
+            value = formatters[field](d[field], wrap)
+            pt.add_row([field, value])
         else:
-            pt.add_row([field, d[field]])
+            value = textwrap.fill(six.text_type(d[field]), wrap)
+            pt.add_row([field, value])
     print(pt.get_string(sortby='Property'))
 
 
@@ -278,3 +317,29 @@ def get_response_body(resp):
     else:
         body = None
     return body
+
+
+def terminal_width():
+    if hasattr(os, 'get_terminal_size'):
+        # python 3.3 onwards has built-in support for getting terminal size
+        try:
+            return os.get_terminal_size().columns
+        except OSError:
+            return None
+    try:
+        # winsize structure has 4 unsigned short fields
+        winsize = b'\0' * struct.calcsize('hhhh')
+        try:
+            winsize = ioctl(sys.stdout, termios.TIOCGWINSZ, winsize)
+        except IOError:
+            return None
+        except TypeError:
+            # this is raised in unit tests as stdout is sometimes a StringIO
+            return None
+        winsize = struct.unpack('hhhh', winsize)
+        columns = winsize[1]
+        if not columns:
+            return None
+        return columns
+    except IOError:
+        return None
