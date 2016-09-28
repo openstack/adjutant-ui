@@ -350,9 +350,7 @@ def do_user_invite(sc, args):
 @utils.arg('user_id', metavar='<userid>',
            help=_('User id for unconfirmed user.'))
 def do_user_invite_cancel(sc, args):
-    """
-    Cancel user details.
-    """
+    """ Cancel user invitation. """
     try:
         resp = sc.users.cancel(args.user_id)
         print 'Success: %s' % resp.json()
@@ -433,6 +431,28 @@ def do_managed_role_list(sc, args):
 def do_status(sc, args):
     """Requests server status endpoint and returns details of the api server"""
     status = sc.status.get()
+    if status.status_code != 200:
+        print "Failed: %s" % status.reason
+        return
+    print json.dumps(
+        status.json(), sort_keys=True,
+        indent=4, separators=(',', ': '))
+
+
+# Sign-up
+@utils.arg('user', metavar='<user>',
+           help=_('User name for new account.'))
+@utils.arg('email', metavar='<email>',
+           help=_('email of the new account'))
+@utils.arg('project_name', metavar='<project_name>',
+           help=_('name of the new project'))
+def do_sign_up(sc, args):
+    """Submits a sign-up from a user requesting a new project and account.
+
+    Note: You can perform an unauthenticated request to this endpoint using
+    --os-no-client-auth and --bypass-url <stacktask url>
+    """
+    status = sc.signup.post(args.user, args.email, args.project_name)
     if status.status_code != 200:
         print "Failed: %s" % status.reason
         return
