@@ -413,14 +413,16 @@ class StacktaskShell(object):
             self.do_bash_completion(args)
             return 0
 
-        if not args.os_username and not args.os_token:
+        if (not args.os_username and not args.os_token and
+                not args.os_no_client_auth):
             raise exc.CommandError(
                 _("You must provide a username via either "
                   "--os-username or env[OS_USERNAME] "
                   "or a token via --os-token or "
                   "env[OS_TOKEN]"))
 
-        if not args.os_password and not args.os_token:
+        if (not args.os_password and not args.os_token and
+                not args.os_no_client_auth):
             raise exc.CommandError(
                 _("You must provide a password via either "
                   "--os-password or env[OS_PASSWORD] "
