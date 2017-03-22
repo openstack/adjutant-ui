@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Forgot password" %}{% endblock %}
+
+{% block body_id %}splash{% endblock %}
+
+{% block content %}
+  {% include 'forgot_password/_sent.html' %}
+{% endblock %}

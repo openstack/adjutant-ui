@@ -1,0 +1,7 @@
+{% overextends 'auth/_login_page.html' %}
+{% load i18n %}
+
+{% block login_footer %}
+  {{ block.super }}
+  <p>Can't log in? <a href="{% url 'horizon:forgot_password:forgot_password:forgot_index' %}">Reset your password</a>.</p>
+{% endblock %}

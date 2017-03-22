@@ -1,0 +1,29 @@
+{% extends "horizon/common/_modal_form.html" %}
+{% load i18n %}
+{% load url from future %}
+
+{% block modal_id %}update_user_form{% endblock %}
+{% block modal-header %}{% trans "Update User" %}{% endblock %}
+{% block form_action %}{% url 'horizon:management:project_users:update' user.id %}{% endblock %}
+{% block modal-body %}
+<div class="left">
+  <fieldset>
+    {% include "horizon/common/_form_fields.html" %}
+    </fieldset>
+</div>
+<div class="right">
+    <h3>{% trans "Description:" %}</h3>
+    <p>{% trans "Adjust user roles to revoke or grant roles within this project." %}</p>
+    <h4>{% trans "Roles:" %}</h4>
+    <p>{% trans "The “Project Admin” role allows users to have full control over your project, including adding moderators and inviting other people to join it." %}</p>
+    <p>{% trans "The “Project Moderator” role can invite other people to join your project and update their roles, but cannot change the project admin." %}</p>
+    <p>{% trans "The “Project Member” role gives people access to all services on your project, but does not allow them to invite other people to join the project or update roles." %}</p>
+    <p>{% trans "For other roles or more information about access control, please refer to the <a href=\"http://docs.catalystcloud.io/access-control.html\">access control section of the Catalyst Cloud documentation</a>." %}</p>
+</div>
+{% endblock %}
+
+{% block modal-footer %}
+    <button type="submit" class="btn btn-primary">{% trans "Update" %}</button>
+    <a href="{% url 'horizon:management:project_users:index' %}" class="btn btn-default secondary cancel pull-left">{% trans "Cancel" %}</a>
+{% endblock %}
+
