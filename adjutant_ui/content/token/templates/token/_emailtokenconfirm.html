@@ -1,0 +1,33 @@
+{% extends 'token/_tokenconfirm_form.html' %}
+{% load i18n %}
+
+{% block pre_login %}
+  <div class="container login">
+    <div class="row">
+      <div class="col-xs-11 col-sm-8 col-md-6 col-lg-5 horizontal-center">
+        {{ block.super }}
+{% endblock %}
+
+{% block login_header %}
+  {% include 'auth/_splash.html' %}
+  <h3 class="login-title">
+    {% trans 'Confirm Email Address Update' %}
+  </h3>
+{% endblock %}
+
+
+{% block post_login %}
+      {{ block.super }}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block login_body %}
+  Please confirm the change to your email address.
+{% endblock %}
+
+{% block login_footer %}
+  <button id="tokenBtn" type="submit" class="btn btn-primary">{% trans "Confirm" %}</button>
+  <div class="clearfix"></div>
+{% endblock %}

@@ -51,6 +51,10 @@ def submit_token_router(request, *args, **kwargs):
     if 'password' in json['required_fields']:
         return SubmitTokenPasswordView.as_view()(request, *args, **kwargs)
     elif 'confirm' in json['required_fields']:
+
+        if 'UpdateUserEmailAction' in json['actions']:
+            return UpdateEmailTokenSubmitView.as_view()(
+                request, *args, **kwargs)
         return SubmitTokenConfirmView.as_view()(request, *args, **kwargs)
 
     return _logout_msg_response(request, _("Unsupported token type."))
@@ -101,6 +105,7 @@ class SubmitTokenPasswordView(forms.ModalFormView):
 class SubmitTokenConfirmView(forms.ModalFormView):
     form_class = token_forms.ConfirmForm
     template_name = 'token/tokenconfirm.html'
+    success_msg = _("Welcome to the project! Please log in to continue.")
 
     def get(self, request, *args, **kwargs):
         sc = super(SubmitTokenConfirmView, self)
@@ -120,10 +125,9 @@ class SubmitTokenConfirmView(forms.ModalFormView):
                                                parameters)
 
         if token_response.ok:
-            msg = _("Welcome to the project! Please log in to continue.")
-            return _logout_msg_response_success(form.request, msg)
+            return _logout_msg_response_success(form.request, self.success_msg)
 
-        msg = (_("Invitation accept form submission failed. "
+        msg = (_("Token form submission failed. "
                  "Response code %(code)s.") % {'code':
                                                token_response.status_code})
         return _logout_msg_response(form.request, msg)
@@ -136,3 +140,8 @@ class SubmitTokenConfirmView(forms.ModalFormView):
         except Exception:
             exceptions.handle(self.request)
         return context
+
+
+class UpdateEmailTokenSubmitView(SubmitTokenConfirmView):
+    template_name = 'token/emailtokenconfirm.html'
+    success_msg = _("Your email has been updated! Please log in to continue.")

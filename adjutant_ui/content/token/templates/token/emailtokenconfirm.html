@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Confirm email update" %}{% endblock %}
+
+{% block body_id %}splash{% endblock %}
+
+{% block content %}
+  {% include 'token/_emailtokenconfirm.html' %}
+{% endblock %}
+
+{% comment %}Explicitly redeclare the piwik block as empty{% endcomment %}
+{% block piwik %}{% endblock %}

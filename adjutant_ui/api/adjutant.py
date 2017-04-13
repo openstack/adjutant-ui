@@ -229,6 +229,16 @@ def token_submit(request, token, data):
                 data=json.dumps(data), headers=headers)
 
 
+def email_update(request, email):
+    headers = {'Content-Type': 'application/json',
+               'X-Auth-Token': request.user.token.id}
+    data = {
+        'new_email': email
+    }
+    return post(request, 'openstack/users/email-update',
+                data=json.dumps(data), headers=headers)
+
+
 def forgotpassword_submit(request, data):
     headers = {"Content-Type": "application/json"}
     try:
