@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<div class=quota-help>
+  <p>{% blocktrans trimmed %}
+      Your current quotas are avaliable here, and can be changed to suit your needs.
+  {% endblocktrans %}</p>
+
+  <p>{% blocktrans trimmed %}
+      Certain types of quota changes, such as changing your quota more than once
+      in a given period, or changing your quota by large amounts will require admin
+      approval. The period and the quota sizes themselves is configured by your
+      admin, with the default period being 30 days.
+  {% endblocktrans %}</p>
+
+  <p>{% blocktrans trimmed %}
+      If your proposed change needed approval, you will be emailed on completion.
+  {% endblocktrans %}</p>
+</div>

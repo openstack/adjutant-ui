@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Quotas" %}{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_page_header.html" with title=_("Quotas") %}
+{% endblock page_header %}
+
+{% block main %}
+<div class="left">
+    {% include 'management/quota/_index_help.html' %}
+  <div id="region-overview">
+      {{ region_overview_table.render }}
+  </div>
+
+  <div id="quota-tasks-overview">
+      {{ quota_tasks_table.render }}
+  </div>
+</div>
+<div class="right">
+
+  <div id="size-overview">
+      {{ size_overview_table.render }}
+  </div>
+</div>
+
+{% endblock %}

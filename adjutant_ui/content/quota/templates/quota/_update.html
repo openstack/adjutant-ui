@@ -1,0 +1,62 @@
+{% extends "horizon/common/_modal_form.html" %}
+{% load i18n %}
+
+{% block form_id %}update_quota_form{% endblock %}
+{% block form_action %}{% url 'horizon:management:quota:update' region.id %}{% endblock %}
+{% block form_attrs %}enctype="multipart/form-data"{% endblock %}
+
+{% block modal-body %}
+<div class="left">
+  <fieldset>
+    {% include "horizon/common/_form_fields.html" %}
+  </fieldset>
+</div>
+<div class="right">
+    <a id="toggle_link" onclick='toggleDisplayTable()'>{% trans 'Display all quotas' %}</a>
+    {{ change_size_table.render }}
+    <script>
+      var select = document.getElementById('id_size')
+      var toggle_link = document.getElementById('toggle_link')
+      var show_all = false;
+
+      var table = document.getElementById("change_size");
+      var count_headings = table.getElementsByClassName("table_count");
+
+      for (i=0; i<count_headings.length; i++){
+        count_headings[i].parentElement.parentElement.style.display = 'none';
+      }
+
+      function updateSizeTable(){
+        var current_size = select.options[select.selectedIndex].value;
+        var rows = document.getElementById("change_size").tBodies[0].rows;
+        for (i=1; i < rows.length; i++){
+          var cell = rows[i].cells[4];
+          var value_dict = $.parseJSON(rows[i].getAttribute('size_blob'));
+          cell.innerHTML = value_dict[current_size]
+        }
+      }
+
+      function toggleDisplayTable(){
+        show_all = !show_all;
+
+        if(show_all){
+          toggle_link.innerHTML = "{% trans 'Hide some rows' %}";
+        }else{
+          toggle_link.innerHTML = "{% trans 'Display all quotas' %}";
+        }
+
+        var tr = document.getElementById("change_size").tBodies[0].rows;
+         for (i=0; i<tr.length; i++){
+            if (tr[i].getAttribute('hide') == ""){
+               if (show_all){
+                  tr[i].style.display = '';
+               } else {
+                 tr[i].style.display = 'none';
+               }
+            }
+         }
+      }
+      updateSizeTable()
+    </script>
+</div>
+{% endblock %}

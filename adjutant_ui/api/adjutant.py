@@ -17,10 +17,12 @@ import json
 import logging
 import requests
 from six.moves.urllib.parse import urljoin
+import six
 
 from django.conf import settings
 
 from horizon.utils import functions as utils
+from horizon.utils import memoized
 
 from openstack_dashboard.api import base
 
@@ -36,6 +38,68 @@ TASK = collections.namedtuple('Task',
                                'request_by', 'request_project',
                                'created_on', 'approved_on', 'page',
                                'completed_on', 'actions', 'status'])
+
+QUOTA_SIZE = collections.namedtuple('QuotaSize',
+                                    ['id', 'name', 'cinder',
+                                     'nova', 'neutron'])
+
+REGION_QUOTA = collections.namedtuple('RegionQuota',
+                                      ['id', 'region',
+                                       'quota_size', 'preapproved_quotas'])
+
+REGION_QUOTA_VALUE = collections.namedtuple('RegionQuotaValue',
+                                            ['id', 'name',
+                                             'service', 'current_quota',
+                                             'current_usage', 'percent',
+                                             'size_blob', 'important'])
+
+SIZE_QUOTA_VALUE = collections.namedtuple('SizeQuotaValue',
+                                          ['id', 'name', 'service',
+                                           'value', 'current_quota',
+                                           'current_usage', 'percent'])
+
+QUOTA_TASK = collections.namedtuple(
+    'QuotaTask',
+    ['id', 'regions', 'size', 'user', 'created', 'valid', 'status'])
+
+
+# NOTE(amelia): A list of quota names that we consider to be the most
+# relevant to customers to be shown initially on the update page.
+# These can be overriden in the local_settings file:
+# IMPORTANT_QUOTAS = {<service>: [<quota_name>], }
+DEFAULT_IMPORTANT_QUOTAS = {
+    'nova': [
+         'instances', 'cores', 'ram',
+    ],
+    'cinder': [
+        'volumes', 'snapshots', 'gigabytes',
+    ],
+    'neutron': [
+         'network', 'floatingip', 'router', 'security_group',
+    ],
+}
+
+
+# NOTE(adriant): Quotas that should be hidden by default.
+# Can be overriden in the local_settings file by setting:
+# HIDDEN_QUOTAS = {<service>: [<quota_name>], }
+# or disabled entirely with: HIDDEN_QUOTAS = {}
+DEFAULT_HIDDEN_QUOTAS = {
+    # these values have long since been deprecated from Nova
+    'nova': [
+        'security_groups', 'security_group_rules',
+        'floating_ips', 'fixed_ips',
+    ],
+    # these by default have no limit
+    'cinder': [
+        'per_volume_gigabytes', 'volumes_lvmdriver-1',
+        'gigabytes_lvmdriver-1', 'snapshots_lvmdriver-1',
+
+    ],
+    'neutron': [
+        'subnetpool',
+    ],
+}
 
 
 def _get_endpoint_url(request):
@@ -287,11 +351,10 @@ def task_list(request, filters={}, page=1):
         more = resp['has_more']
         for task in resp['tasks']:
             tasklist.append(task_obj_get(request, task=task, page=page))
+        return tasklist, prev, more
     except Exception as e:
         LOG.error(e)
         raise
-
-    return tasklist, prev, more
 
 
 def task_get(request, task_id):
@@ -364,3 +427,190 @@ def task_revalidate(request, task_id):
         data.update(action_data)
 
     return task_update(request, task_id, json.dumps(data))
+
+
+# Quota management functions
+def _is_quota_hidden(service, resource):
+    hidden_quotas = getattr(settings, 'HIDDEN_QUOTAS', None)
+    if hidden_quotas is None:
+        hidden_quotas = DEFAULT_HIDDEN_QUOTAS
+    return service in hidden_quotas and resource in hidden_quotas[service]
+
+
+def _is_quota_important(service, resource):
+    important_quotas = getattr(settings, 'IMPORTANT_QUOTAS', None)
+    if important_quotas is None:
+        important_quotas = DEFAULT_IMPORTANT_QUOTAS
+    return (
+        service in important_quotas and resource in important_quotas[service])
+
+
+@memoized.memoized_method
+def _get_quota_information(request, regions=None):
+    headers = {'Content-Type': 'application/json',
+               'X-Auth-Token': request.user.token.id}
+    params = {}
+    if regions:
+        params = {'regions': regions}
+    try:
+        return get(request, 'openstack/quotas/',
+                   params=params, headers=headers).json()
+    except Exception as e:
+        LOG.error(e)
+        raise
+
+
+def quota_sizes_get(request, region=None):
+    # Gets the list of quota sizes, and a json blob defining what they
+    # have for each of the services
+    # Region param is useless here, but nedded for memoized decorator to work
+    quota_sizes_dict = {}
+
+    resp = _get_quota_information(request, regions=region)
+
+    for size_name, size in six.iteritems(resp['quota_sizes']):
+        quota_sizes_dict[size_name] = QUOTA_SIZE(
+            id=size_name,
+            name=size_name,
+            cinder=json.dumps(size['cinder'], indent=1),
+            nova=json.dumps(size['nova'], indent=1),
+            neutron=json.dumps(size['neutron'], indent=1),
+        )
+
+    quota_sizes = []
+    for size in resp['quota_size_order']:
+        quota_sizes.append(quota_sizes_dict[size])
+
+    return quota_sizes
+
+
+def size_details_get(request, size, region=None):
+    """ Gets the current details of the size as well as the current region's
+    quota
+    """
+    quota_details = []
+
+    if not region:
+        region = request.user.services_region
+    resp = _get_quota_information(request, regions=region)
+
+    data = resp['quota_sizes'][size]
+    region_data = resp['regions'][0]['current_quota']
+    for service, values in six.iteritems(data):
+        for resource, value in six.iteritems(values):
+            if _is_quota_hidden(service, resource):
+                continue
+
+            usage = resp['regions'][0]['current_usage'][service].get(
+                resource)
+            try:
+                percent = float(usage)/value
+            except TypeError:
+                percent = '-'
+
+            quota_details.append(
+                SIZE_QUOTA_VALUE(
+                    id=resource,
+                    name=resource,
+                    service=service,
+                    value=value,
+                    current_quota=region_data[service][resource],
+                    current_usage=usage,
+                    percent=percent
+                )
+            )
+    return quota_details
+
+
+def quota_details_get(request, region):
+    quota_details = []
+
+    resp = _get_quota_information(request, regions=region)
+
+    data = resp['regions'][0]['current_quota']
+
+    for service, values in six.iteritems(data):
+        for name, value in six.iteritems(values):
+            if _is_quota_hidden(service, name):
+                continue
+
+            if value < 0:
+                value = 'No Limit'
+            usage = resp['regions'][0]['current_usage'][service].get(name)
+            try:
+                percent = float(usage)/value
+            except TypeError:
+                percent = '-'
+
+            size_blob = {}
+            for size_name, size_data in resp['quota_sizes'].iteritems():
+                size_blob[size_name] = size_data[service].get(name, '-')
+
+            if name != 'id':
+                quota_details.append(
+                    REGION_QUOTA_VALUE(
+                        id=name,
+                        name=name,
+                        service=service,
+                        current_quota=value,
+                        current_usage=usage,
+                        percent=percent,
+                        size_blob=size_blob,
+                        important=_is_quota_important(service, name)
+                    )
+                )
+    return quota_details
+
+
+def region_quotas_get(request, region=None):
+    quota_details = []
+
+    resp = _get_quota_information(request, regions=region)
+
+    data = resp['regions']
+    for region_values in data:
+        quota_details.append(
+            REGION_QUOTA(
+                id=region_values['region'],
+                region=region_values['region'],
+                quota_size=region_values['current_quota_size'],
+                preapproved_quotas=', '.join(region_values[
+                    'quota_change_options'])
+            )
+        )
+    return quota_details
+
+
+def quota_tasks_get(request, region=None):
+    # Region param only used to help with memoized decorator
+    quota_tasks = []
+
+    resp = _get_quota_information(request, regions=region)
+
+    for task in resp['active_quota_tasks']:
+        quota_tasks.append(
+            QUOTA_TASK(
+                id=task['id'],
+                regions=', '.join(task['regions']),
+                size=task['size'],
+                user=task['request_user'],
+                created=task['task_created'].split("T")[0],
+                valid=task['valid'],
+                status=task['status'],
+            )
+        )
+    return quota_tasks
+
+
+def update_quotas(request, size, regions=[]):
+    headers = {'Content-Type': 'application/json',
+               'X-Auth-Token': request.user.token.id}
+    data = {
+        'size': size,
+    }
+    if regions:
+        data['regions'] = regions
+
+    return post(request, 'openstack/quotas/',
+                data=json.dumps(data),
+                headers=headers)
