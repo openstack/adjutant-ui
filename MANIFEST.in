@@ -3,5 +3,6 @@ include setup.py
 recursive-include stacktask_ui/content/default/templates *
 recursive-include stacktask_ui/content/forgotpassword/templates *
 recursive-include stacktask_ui/content/project_users/templates *
+recursive-include stacktask_ui/content/tasks/templates *
 recursive-include stacktask_ui/content/token/templates *
 recursive-include stacktask_ui/static *

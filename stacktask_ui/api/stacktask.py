@@ -20,6 +20,8 @@ from six.moves.urllib.parse import urljoin
 
 from django.conf import settings
 
+from horizon.utils import functions as utils
+
 from openstack_dashboard.api import base
 
 LOG = logging.getLogger(__name__)
@@ -28,6 +30,12 @@ USER = collections.namedtuple('User',
                                'roles', 'cohort', 'status'])
 TOKEN = collections.namedtuple('Token',
                                ['action'])
+
+TASK = collections.namedtuple('Task',
+                              ['id', 'task_type', 'valid',
+                               'request_by', 'request_project',
+                               'created_on', 'approved_on', 'page',
+                               'completed_on', 'actions', 'status'])
 
 
 def _get_endpoint_url(request):
@@ -230,3 +238,90 @@ def forgotpassword_submit(request, data):
     except Exception as e:
         LOG.error(e)
         raise
+
+
+def task_list(request, filters={}, page=1):
+    tasks_per_page = utils.get_page_size(request)
+    tasklist = []
+    prev = more = False
+    try:
+        headers = {"Content-Type": "application/json",
+                   'X-Auth-Token': request.user.token.id}
+        params = {
+            "filters": json.dumps(filters),
+            "page": page,
+            "tasks_per_page": tasks_per_page
+        }
+        resp = get(request, "tasks", params=params, data=json.dumps({}),
+                   headers=headers).json()
+        prev = resp['has_prev']
+        more = resp['has_more']
+        for task in resp['tasks']:
+            tasklist.append(task_obj_get(request, task=task, page=page))
+    except Exception as e:
+        LOG.error(e)
+        raise
+
+    return tasklist, prev, more
+
+
+def task_get(request, task_id):
+    # Get a single task
+    headers = {"Content-Type": "application/json",
+               'X-Auth-Token': request.user.token.id}
+
+    return get(request, "tasks/%s" % task_id,
+               headers=headers)
+
+
+def task_obj_get(request, task_id=None, task=None, page=0):
+    if not task:
+        task = task_get(request, task_id)
+
+    status = "Awaiting Approval"
+    if task['cancelled']:
+        status = "Cancelled"
+    elif task['completed_on']:
+        status = "Completed"
+    elif task['approved_on']:
+        status = "Approved; Incomplete"
+
+    valid = False not in [action['valid'] for
+                          action in task['actions']]
+    return TASK(
+            id=task['uuid'],
+            task_type=task['task_type'],
+            valid=valid,
+            request_by=task['keystone_user'].get('username'),
+            request_project=task['keystone_user'].get('project_name'),
+            status=status,
+            created_on=task['created_on'],
+            approved_on=task['approved_on'],
+            completed_on=task['completed_on'],
+            actions=task['actions'],
+            page=page
+        )
+
+
+def task_cancel(request, task_id):
+    headers = {"Content-Type": "application/json",
+               'X-Auth-Token': request.user.token.id}
+
+    return delete(request, "tasks/%s" % task_id,
+                  headers=headers)
+
+
+def task_approve(request, task_id):
+    headers = {"Content-Type": "application/json",
+               'X-Auth-Token': request.user.token.id}
+
+    return post(request, "tasks/%s" % task_id,
+                data=json.dumps({"approved": True}), headers=headers)
+
+
+def task_update(request, task_id, new_data):
+    headers = {"Content-Type": "application/json",
+               'X-Auth-Token': request.user.token.id}
+
+    return put(request, "tasks/%s" % task_id,
+               data=new_data, headers=headers)

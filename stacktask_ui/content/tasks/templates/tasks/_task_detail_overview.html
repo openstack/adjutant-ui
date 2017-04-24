@@ -1,0 +1,45 @@
+{% load i18n sizeformat %}
+{% load task_filters %}
+
+<div class="detail">
+  <h4>{% trans "Task Details" %}</h4>
+  <hr class="header_rule">
+  <dl class="dl-horizontal">
+    <dt>{% trans "Task Type" %}</dt>
+    <dd>{{ task.task_type }}</dd>
+    <dt>{% trans "ID" %}</dt>
+    <dd>{{ task.uuid }}</dd>
+    <dt>{% trans "Cancelled" %}</dt>
+    <dd>{{ task.cancelled }}</dd>
+    <dt>{% trans "Approved" %}</dt>
+    <dd>{{ task.approved }}</dd>
+    <dt>{% trans "Completed" %}</dt>
+    <dd>{{ task.completed }}</dd>
+    {% if task.approved_by %}
+      <dt>{% trans "Approved By" %}</dt>
+      <dd>{{ task.approved_by.username }}</dd>
+    {% endif %}
+    <dt>{% trans "Requested on" %}</dt>
+    <dd>{{ task.created_on }}</dd>
+    <dt>{% trans "Approved on" %}</dt>
+    <dd>{% if task.approved_on %}{{ task.approved_on}}{% else %}-{% endif %}</dd>
+    <dt>{% trans "Completed on" %}</dt>
+    <dd>{% if task.completed_on %}{{ task.completed_on}}{% else %}-{% endif %}</dd>
+  </dl>
+
+
+  {% if task.keystone_user %}
+    <h4>{% trans "Requestee" %}</h4>
+    <hr class="header_rule">
+    <dl class="dl-horizontal">
+      <dt>{% trans "Username" %}</dt>
+      <dd>{{ task.keystone_user.username }}</dd>
+      <dt>{% trans "Project" %}</dt>
+      <dd>{{ task.keystone_user.project_name }}</dd>
+      <dt>{% trans "Roles" %}</dt>
+      <dd>{{ task.keystone_user.roles|pretty_list }}</dd>
+      <dt>{% trans "IP Address" %}</dt>
+      <dd>{{ task.ip_address }}</dd>
+    </dl>
+  {% endif %}
+</div>

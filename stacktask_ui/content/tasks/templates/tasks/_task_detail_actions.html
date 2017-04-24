@@ -1,0 +1,17 @@
+{% load i18n sizeformat %}
+{% load task_filters %}
+
+<div class="detail">
+    <h4>{% trans "Actions" %}</h4>
+    <hr class="header_rule">
+    {% for action in task.actions %}
+    <h5>{{ action.action_name }}</h5>
+    <hr class="header_rule">
+    <dl class="dl-horizontal">
+      <dt>{% trans "Valid" %}</dt>
+      <dd>{{ action.valid }}</dd>
+      <dt>{% trans "Data" %}</dt>
+      <dd><pre>{{ action.data|pretty_json }}</pre></dd>
+    </dl>
+    {% endfor %}
+</div>
