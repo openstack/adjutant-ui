@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -36,6 +37,7 @@ def get_role_choices(request):
 
 
 class InviteUserForm(forms.SelfHandlingForm):
+    username = forms.CharField(max_length=255, label=_("User Name"))
     email = forms.EmailField()
     roles = forms.MultipleChoiceField(label=_("Roles"),
                                       required=True,
@@ -46,6 +48,9 @@ class InviteUserForm(forms.SelfHandlingForm):
 
     def __init__(self, *args, **kwargs):
         super(InviteUserForm, self).__init__(*args, **kwargs)
+        if (hasattr(settings, 'USERNAME_IS_EMAIL') and
+                getattr(settings, 'USERNAME_IS_EMAIL')):
+            self.fields.pop('username')
         self.fields['roles'].choices = get_role_choices(self.request)
         self.fields['roles'].initial = ['_member_']
 

@@ -27,21 +27,26 @@ USERNAME_IS_EMAIL = True
 
 
 class ForgotPasswordForm(hforms.SelfHandlingForm):
+    username = forms.CharField(max_length=255, label=_("User Name"))
     email = forms.EmailField(
         label=_("Email"),
         widget=forms.TextInput(attrs={"autofocus": "autofocus"})
     )
 
+    def __init__(self, *args, **kwargs):
+        super(ForgotPasswordForm, self).__init__(*args, **kwargs)
+        if (hasattr(settings, 'USERNAME_IS_EMAIL') and
+                getattr(settings, 'USERNAME_IS_EMAIL')):
+            self.fields.pop('username')
+
     def clean(self, *args, **kwargs):
         # validate username and email?
         return super(ForgotPasswordForm, self).clean(*args, **kwargs)
 
-    def handle(self, *args, **kwargs):
-        email = self.cleaned_data['email']
-
+    def handle(self, request, data):
         try:
-            submit_response = stacktask.forgotpassword_submit(self.request,
-                                                              email)
+            submit_response = stacktask.forgotpassword_submit(
+                request, data)
             if submit_response.ok:
                 return True
         except Exception:

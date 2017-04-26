@@ -221,15 +221,8 @@ def token_submit(request, token, data):
                 data=json.dumps(data), headers=headers)
 
 
-def forgotpassword_submit(request, email, username=None):
-    # Username is optional only if the registration API considers it so
-    # In this case the backend assumes email==username
+def forgotpassword_submit(request, data):
     headers = {"Content-Type": "application/json"}
-    data = {
-        'email': email
-    }
-    if username:
-        data['username'] = username
     try:
         return post(request, 'openstack/users/password-reset',
                     data=json.dumps(data),

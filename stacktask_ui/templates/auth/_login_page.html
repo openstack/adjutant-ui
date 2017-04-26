@@ -1,0 +1,9 @@
+{% overextends 'auth/_login_page.html' %}
+
+{% load i18n %}
+{% load relabel_username_field %}
+
+{% block login_body %}
+  {% relabel_username_field %}
+  {{ block.super }}
+{% endblock %}
