@@ -27,14 +27,13 @@ class NotificationManager(base.ManagerWithFind):
     def get(self, note_id):
         return self._get("/notifications/%s" % base.getid(note_id))
 
-    def list(self, filters, **kwargs):
+    def list(self, **kwargs):
         """Get a list of notifications.
 
         :rtype: list of :class:`Notification`
         """
-        filters = {'filters': filters}
         url = '/notifications?%(params)s' % {
-            'params': parse.urlencode(filters, True)
+            'params': parse.urlencode(kwargs, True)
         }
         return self._list(url, 'notifications')
 

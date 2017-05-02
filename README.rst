@@ -7,37 +7,25 @@ StackTask Client can be installed from PyPI using pip:
 
 ::
 
-    pip install python-stacktaskclient
+    pip install python-openstackclient python-stacktaskclient
 
-There are a few variants on getting help. A list of global options and supported commands is shown with --help:
 
-::
+The command line client is installed as a plugin for the OpenStack client, and
+an older deprecated version is available under the entry point 'stacktask'.
 
-    stacktask --help
+Python API
+==========
 
-There is also a help command that can be used to get help text for a specific command:
+In order to use the python api directly, you must first obtain an auth
+token and identify which endpoint you wish to speak to::
 
-::
+  >>> stacktask_url = 'http://stacktask.example.org:8004/v1/'
+  >>> auth_token = '3bcc3d3a03f44e3d8377f9247b0ad155'
 
-    stacktask user-invite --help
+Once you have done so, you can use the API like so::
 
-Configuration
-=============
+  >>> from stacktaskclient.client import Client
+  >>> stacktask = Client('1', endpoint=stacktask_url, token=auth_token)
 
-Authentication using username/password is most commonly used:
-
-::
-
-    export OS_AUTH_URL=<url-to-openstack-identity>
-    export OS_PROJECT_NAME=<project-name>
-    export OS_USERNAME=<username>
-    export OS_PASSWORD=<password>
-
-The corresponding command-line options look very similar:
-
-::
-
-    --os-auth-url <url>
-    --os-project-name <project-name>
-    --os-username <username>
-    [--os-password <password>]
+An auth token isn't needed for accessing signup, user.password_forgot(),
+token.submit() or token.get().

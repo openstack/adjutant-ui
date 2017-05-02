@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Catalyst IT Ltd
+# Copyright (c) 2016 Catalyst IT Ltd.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,17 +12,20 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from stacktaskclient.openstack.common.apiclient import base
+import logging
+import json
+
+from osc_lib.command import command
 
 
-class SignupManager(base.BaseManager):
+LOG = logging.getLogger(__name__)
 
-    def post(self, username, email, project_name, setup_network):
-        url = '/openstack/sign-up'
-        fields = {
-            'username': username,
-            'email': email,
-            'project_name': project_name,
-            'setup_network': setup_network
-        }
-        return self.client.post(url, data=fields)
+
+class Status(command.Command):
+    """Lists stacktask tasks. """
+
+    def take_action(self, parsed_args):
+        client = self.app.client_manager.registration
+
+        status = client.status.get().json()
+        print(json.dumps(status, indent=2))

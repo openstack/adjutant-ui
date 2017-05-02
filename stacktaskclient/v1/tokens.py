@@ -33,14 +33,13 @@ class TokenManager(base.BaseManager):
         url = 'tokens/%s' % token_id
         return self._get(url)
 
-    def list(self, filters, **kwargs):
+    def list(self, **kwargs):
         """Get a list of tokens.
 
         :rtype: list of :class:`Token`
         """
-        filters = {'filters': filters}
         url = '/tokens?%(params)s' % {
-            'params': parse.urlencode(filters, True)
+            'params': parse.urlencode(kwargs, True)
         }
         return self._list(url, 'tokens')
 

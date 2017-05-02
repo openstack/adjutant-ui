@@ -108,9 +108,11 @@ class UserManager(base.ManagerWithFind):
         # rather than an invite.
         return self.cancel(user_id)
 
-    def password_forgot(self, email):
+    def password_forgot(self, email, username=None):
         """Forgot password email submission."""
         params = {"email": email}
+        if username:
+            params['username'] = username
 
         return self.client.post("openstack/users/password-reset",
                                 data=params)

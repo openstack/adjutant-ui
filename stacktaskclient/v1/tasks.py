@@ -27,15 +27,13 @@ class TaskManager(base.ManagerWithFind):
     def get(self, task_id):
         return self._get("/tasks/%s" % base.getid(task_id))
 
-    def list(self, filters, **kwargs):
+    def list(self, **kwargs):
         """Get a list of tasks.
 
         :rtype: list of :class:`Task`
         """
-        filters = {'filters': filters}
-
         url = '/tasks?%(params)s' % {
-            'params': parse.urlencode(filters, True)
+            'params': parse.urlencode(kwargs, True)
         }
         return self._list(url, 'tasks')
 
