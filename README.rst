@@ -35,7 +35,7 @@ editor. You will want to customize several settings:
 -  ``OPENSTACK_REGISTRATION_URL`` should also be configured to point to
    you StackTask server and version.
 
-You will also need to update the ``keystone_policy.json`` file in horizon with
+You will also need to update the ``keystone_policy.json`` file (openstack_dashboard/conf/keystone_policy.json) in horizon with
 the following lines::
 
     "project_mod": "role:project_mod",
@@ -50,7 +50,7 @@ Install StackTask UI with all dependencies in your virtual environment::
 
 And enable it in Horizon::
 
-    cp ../stacktask-ui/enabled/ openstack_dashboard/local/enabled
+    cp ../stacktask-ui/stacktask-ui/enabled/_* openstack_dashboard/local/enabled
 
 To run horizon with the newly enabled StackTask UI plugin run::
 
