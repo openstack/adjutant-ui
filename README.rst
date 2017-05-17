@@ -1,19 +1,19 @@
 ============
-stacktask-ui
+adjutant-ui
 ============
 
-StackTask Dashboard
+Adjutant Dashboard
 
 * Free software: Apache license
-* Source: https://github.com/catalyst/stacktask-ui
+* Source: https://github.com/catalyst/adjutant-ui
 
 Manual Installation
 -------------------
 
-Begin by cloning the Horizon and StackTask UI repositories::
+Begin by cloning the Horizon and Adjutant UI repositories::
 
     git clone https://github.com/openstack/horizon
-    git clone https://github.com/catalyst/stacktask-ui
+    git clone https://github.com/catalyst/adjutant-ui
 
 Create a virtual environment and install Horizon dependencies::
 
@@ -33,7 +33,7 @@ editor. You will want to customize several settings:
    environment. (They should be correct unless you modified your
    OpenStack server to change them.)
 -  ``OPENSTACK_REGISTRATION_URL`` should also be configured to point to
-   you StackTask server and version.
+   you Adjutant server and version.
 
 You will also need to update the ``keystone_policy.json`` file (openstack_dashboard/conf/keystone_policy.json) in horizon with
 the following lines::
@@ -44,15 +44,15 @@ the following lines::
     "project_admin_only": "rule:admin_required or rule:project_admin",
     "identity:project_users_access": "rule:project_mod_or_admin",
 
-Install StackTask UI with all dependencies in your virtual environment::
+Install Adjutant UI with all dependencies in your virtual environment::
 
-    tools/with_venv.sh pip install -e ../stacktask-ui/
+    tools/with_venv.sh pip install -e ../adjutant-ui/
 
 And enable it in Horizon::
 
-    cp ../stacktask-ui/stacktask-ui/enabled/_* openstack_dashboard/local/enabled
+    cp ../adjutant-ui/adjutant-ui/enabled/_* openstack_dashboard/local/enabled
 
-To run horizon with the newly enabled StackTask UI plugin run::
+To run horizon with the newly enabled Adjutant UI plugin run::
 
     ./run_tests.sh --runserver 0.0.0.0:8080
 

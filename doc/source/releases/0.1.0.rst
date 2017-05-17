@@ -1,2 +1,2 @@
-StackTask UI 0.1.1
+Adjutant UI 0.1.1
 ===============

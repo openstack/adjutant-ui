@@ -57,7 +57,7 @@ root=`pwd -P`
 venv=$root/.venv
 venv_env_version=$venv/environments
 with_venv=tools/with_venv.sh
-included_dirs="stacktask_ui"
+included_dirs="adjutant_ui"
 
 always_venv=0
 backup_env=0
@@ -340,7 +340,7 @@ function run_tests {
   fi
 
   if [ $with_selenium -eq 0 -a $integration -eq 0 ]; then
-      testopts="$testopts --exclude-dir=stacktask_ui/test/integration_tests"
+      testopts="$testopts --exclude-dir=adjutant_ui/test/integration_tests"
   fi
 
   if [ $selenium_headless -eq 1 ]; then
@@ -360,12 +360,12 @@ function run_tests_subset {
 }
 
 function run_tests_all {
-  echo "Running StackTask UI tests"
-  export NOSE_XUNIT_FILE=stacktask_ui/nosetests.xml
+  echo "Running Adjutant UI tests"
+  export NOSE_XUNIT_FILE=adjutant_ui/nosetests.xml
   if [ "$NOSE_WITH_HTML_OUTPUT" = '1' ]; then
     export NOSE_HTML_OUT_FILE='dashboard_nose_results.html'
   fi
-  ${command_wrapper} ${coverage_run} $root/manage.py test stacktask_ui --settings=openstack_dashboard.test.settings $testopts
+  ${command_wrapper} ${coverage_run} $root/manage.py test adjutant_ui --settings=openstack_dashboard.test.settings $testopts
   # get results of the openstack_dashboard tests
   DASHBOARD_RESULT=$?
 
@@ -420,21 +420,21 @@ function babel_extract {
 }
 
 function run_makemessages {
-  echo -n "stacktask ui: "
+  echo -n "adjutant ui: "
   cd
   babel_extract django
-  STACKTASK_PY_RESULT=$?
+  ADJUTANT_PY_RESULT=$?
 
-  echo -n "stacktask ui javascript: "
+  echo -n "adjutant ui javascript: "
   babel_extract djangojs
-  STACKTASK_JS_RESULT=$?
+  ADJUTANT_JS_RESULT=$?
 
   cd ../
   if [ $check_only -eq 1 ]; then
-    rm -f stacktask_ui/locale/django*.pot
+    rm -f adjutant_ui/locale/django*.pot
   fi
 
-  exit $(($STACKTASK_PY_RESULT || $STACKTASK_JS_RESULT))
+  exit $(($ADJUTANT_PY_RESULT || $ADJUTANT_JS_RESULT))
 }
 
 function run_compilemessages {
