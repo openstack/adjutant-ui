@@ -83,8 +83,74 @@ class ApproveTask(tables.BatchAction):
 
     def allowed(self, request, task=None):
         if task:
-            return not(
+            return task.valid and not(
                 task.status == "Completed" or task.status == "Cancelled")
+        return True
+
+
+class ReissueToken(tables.BatchAction):
+    name = "reissue"
+    help_text = _("This will reissue tokens for the selected tasks.")
+
+    @staticmethod
+    def action_present(count):
+        return ungettext_lazy(
+            u"Reissue Token",
+            u"Reissue Tokens",
+            count
+        )
+
+    @staticmethod
+    def action_past(count):
+        return ungettext_lazy(
+            u"Reissued Token",
+            u"Reissued Tokens",
+            count
+        )
+
+    def action(self, request, obj_id):
+        result = adjutant.token_reissue(request, obj_id)
+        if not result or result.status_code != 200:
+            exception = exceptions.NotAvailable()
+            exception._safe_message = False
+            raise exception
+
+    def allowed(self, request, task=None):
+        if task:
+            return task.status == "Approved; Incomplete"
+        return True
+
+
+class RevalidateTask(tables.BatchAction):
+    name = "revalidate"
+    help_text = _("Rerun initial validation for the task.")
+
+    @staticmethod
+    def action_present(count):
+        return ungettext_lazy(
+            u"Rerun Validation",
+            u"Rerun Validation",
+            count
+        )
+
+    @staticmethod
+    def action_past(count):
+        return ungettext_lazy(
+            u"Validation run",
+            u"Validation run",
+            count
+        )
+
+    def action(self, request, obj_id):
+        result = adjutant.task_revalidate(request, obj_id)
+        if not result or result.status_code != 200:
+            exception = exceptions.NotAvailable()
+            exception._safe_message = False
+            raise exception
+
+    def allowed(self, request, task=None):
+        if task:
+            return task.status == 'Awaiting Approval' and not task.valid
         return True
 
 
@@ -96,7 +162,7 @@ class ReapproveTask(ApproveTask):
     def action_present(count):
         return ungettext_lazy(
             u"Reapprove Task",
-            u"Repprove Tasks",
+            u"Reapprove Tasks",
             count
         )
 
@@ -143,8 +209,8 @@ class TaskTable(tables.DataTable):
     class Meta(object):
         name = 'task_table'
         verbose_name = _('Tasks')
-        table_actions = (CancelTask, ApproveTask)
-        row_actions = (ApproveTask, UpdateTask, CancelTask)
+        table_actions = (ApproveTask, RevalidateTask, CancelTask)
+        row_actions = (ApproveTask, UpdateTask, RevalidateTask, CancelTask, )
         prev_pagination_param = pagination_param = 'task_page'
 
     def get_prev_marker(self):
@@ -163,8 +229,8 @@ class ApprovedTaskTable(TaskTable):
     class Meta(object):
         name = 'approved_table'
         verbose_name = _('Tasks')
-        table_actions = (CancelTask, ReapproveTask)
-        row_actions = (CancelTask, ReapproveTask)
+        table_actions = (CancelTask, ReapproveTask, ReissueToken)
+        row_actions = (CancelTask, ReapproveTask, ReissueToken)
         prev_pagination_param = pagination_param = 'approved_page'
 
 

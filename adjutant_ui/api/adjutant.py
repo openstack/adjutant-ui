@@ -229,6 +229,14 @@ def token_submit(request, token, data):
                 data=json.dumps(data), headers=headers)
 
 
+def token_reissue(request, task_id):
+    headers = {'Content-Type': 'application/json',
+               'X-Auth-Token': request.user.token.id}
+    data = {'task': task_id}
+    return post(request, 'tokens/',
+                data=json.dumps(data), headers=headers)
+
+
 def email_update(request, email):
     headers = {'Content-Type': 'application/json',
                'X-Auth-Token': request.user.token.id}
@@ -335,3 +343,13 @@ def task_update(request, task_id, new_data):
 
     return put(request, "tasks/%s" % task_id,
                data=new_data, headers=headers)
+
+
+def task_revalidate(request, task_id):
+    task = task_get(request, task_id=task_id).json()
+
+    data = {}
+    for action_data in [action['data'] for action in task['actions']]:
+        data.update(action_data)
+
+    return task_update(request, task_id, json.dumps(data))
