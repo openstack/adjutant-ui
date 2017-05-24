@@ -18,6 +18,6 @@ import horizon
 
 
 class TaskList(horizon.Panel):
-    name = _('Tasks')
+    name = _('Admin Tasks')
     slug = 'tasks'
     policy_rules = (("identity", "role:admin"),)

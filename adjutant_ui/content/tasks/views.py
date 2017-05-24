@@ -33,7 +33,7 @@ class IndexView(tabs.TabbedTableView):
     tab_group_class = task_tabs.TaskTabs
     template_name = 'management/tasks/index.html'
     redirect_url = 'horizon:management:tasks:index'
-    page_title = _("Tasks")
+    page_title = _("Admin Tasks")
 
 
 class TaskDetailView(tabs.TabView):
