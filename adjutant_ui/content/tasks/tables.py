@@ -57,6 +57,7 @@ class CancelTask(tables.DeleteAction):
 class ApproveTask(tables.BatchAction):
     name = "approve"
     help_text = _("This will approve all of the selected tasks.")
+    action_type = "danger"
 
     @staticmethod
     def action_present(count):
@@ -157,6 +158,7 @@ class RevalidateTask(tables.BatchAction):
 class ReapproveTask(ApproveTask):
     name = "approve"
     help_text = _("This will approve all of the selected tasks.")
+    action_type = "danger"
 
     @staticmethod
     def action_present(count):
