@@ -52,7 +52,10 @@ class TaskDetailView(tabs.TabView):
         return context
 
     def _get_actions(self, task):
-        table = task_tables.TaskTable(self.request)
+        if task.status == 'Approved; Incomplete':
+            table = task_tables.ApprovedTaskTable(self.request)
+        else:
+            table = task_tables.TaskTable(self.request)
         return table.render_row_actions(task)
 
     @memoized.memoized_method
