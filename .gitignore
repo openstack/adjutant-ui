@@ -13,9 +13,10 @@ doc/source/api
 doc/build
 *.egg
 .eggs/*
-stacktaskclient/versioninfo
+adjutantclient/versioninfo
 *.egg-info
 *.log
 .testrepository
 .pypirc
 env/
+*~
