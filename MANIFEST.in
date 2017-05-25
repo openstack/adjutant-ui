@@ -3,6 +3,7 @@ include setup.py
 recursive-include adjutant_ui/content/default/templates *
 recursive-include adjutant_ui/content/forgotpassword/templates *
 recursive-include adjutant_ui/content/project_users/templates *
+recursive-include adjutant_ui/content/signup/templates *
 recursive-include adjutant_ui/content/tasks/templates *
 recursive-include adjutant_ui/content/token/templates *
 recursive-include adjutant_ui/static *

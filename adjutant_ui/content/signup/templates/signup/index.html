@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block title %}{% trans "Sign Up" %}{% endblock %}
+
+{% block body_id %}splash{% endblock %}
+
+{% block content %}
+  {% include 'signup/_index.html' %}
+{% endblock %}

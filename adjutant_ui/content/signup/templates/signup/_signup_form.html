@@ -3,7 +3,7 @@
 {% block pre_login %}
 <form id="" class="ng-pristine ng-valid ng-scope"
       method="POST"
-      action="{% url 'horizon:forgot_password:forgot_password:forgot_index' %}"
+      action="{% url 'horizon:signup:signup:index' %}"
       autocomplete="off"
       ng-controller="hzLoginController">
   {% csrf_token %}
@@ -14,7 +14,7 @@
     <div class="panel-heading">
     {% block login_header %}
       <h3 class="login-title">
-        {% trans 'Forgot password' %}
+        {% trans 'Sign Up' %}
       </h3>
     {% endblock %}
     </div>
@@ -39,8 +39,7 @@
     <div class="panel-footer">
       {% block login_footer %}
         <button id="loginBtn" type="submit" class="btn btn-primary pull-right">
-          <span ng-show="auth_type==='credentials'">{% trans "Submit" %}</span>
-          <span ng-hide="auth_type==='credentials'" ng-cloak>{% trans "Submit" %}</span>
+          <span>{% trans "Submit" %}</span>
         </button>
         <a href="/" class="btn btn-default cancel">
             {% trans "Back to login" %}

@@ -1,0 +1,34 @@
+{% load i18n %}
+
+{% block pre_login %}
+<form>
+  {% csrf_token %}
+{% endblock %}
+
+  <div class="panel panel-default">
+
+    <div class="panel-heading">
+    {% block login_header %}
+      <h3 class="login-title">
+        {% trans 'Sign Up' %}
+      </h3>
+    {% endblock %}
+    </div>
+
+    <div class="panel-body">
+    {% block login_body %}
+      {% trans "Your signup request has been submitted. An email will be sent once an administator approves your request." %}
+    {% endblock %}
+    </div>
+
+    <div class="panel-footer">
+      {% block login_footer %}
+        <a href="/" class="pull-right">{% trans "Back to log in" %}</a>
+        <div class="clearfix"></div>
+      {% endblock %}
+    </div>
+  </div>
+
+{% block post_login%}
+</form>
+{% endblock %}

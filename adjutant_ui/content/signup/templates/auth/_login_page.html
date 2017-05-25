@@ -1,0 +1,7 @@
+{% overextends 'auth/_login_page.html' %}
+{% load i18n %}
+
+{% block login_footer %}
+  {{ block.super }}
+  <p>Don't have an account? <a href="{% url 'horizon:signup:signup:index' %}">Sign up</a>.</p>
+{% endblock %}

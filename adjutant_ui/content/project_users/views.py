@@ -55,7 +55,7 @@ class UpdateUserView(forms.ModalFormView):
     def get_object(self):
         try:
             return adjutant.user_get(self.request,
-                                      self.kwargs['user_id'])
+                                     self.kwargs['user_id'])
         except Exception:
             msg = _('Unable to retrieve user.')
             url = reverse('horizon:management:project_users:index')

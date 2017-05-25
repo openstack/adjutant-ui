@@ -258,6 +258,17 @@ def forgotpassword_submit(request, data):
         raise
 
 
+def signup_submit(request, data):
+    headers = {"Content-Type": "application/json"}
+    try:
+        return post(request, 'openstack/sign-up',
+                    data=json.dumps(data),
+                    headers=headers)
+    except Exception as e:
+        LOG.error(e)
+        raise
+
+
 def task_list(request, filters={}, page=1):
     tasks_per_page = utils.get_page_size(request)
     tasklist = []
