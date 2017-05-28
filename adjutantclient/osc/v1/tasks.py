@@ -26,13 +26,14 @@ LOG = logging.getLogger(__name__)
 def _show_task(task_id, client, formatter):
     task = client.tasks.get(task_id)
     if formatter == 'table':
-        task._info['actions'] = json.dumps(task.actions, indent=2)
-        task._info['keystone_user'] = json.dumps(task.keystone_user,
-                                                 indent=2)
-        task._info['action_notes'] = json.dumps(task.action_notes,
-                                                indent=2)
-        task._info['approved_by'] = json.dumps(task.approved_by,
-                                               indent=2)
+        task._info['actions'] = json.dumps(
+            getattr(task, 'actions', ""), indent=2)
+        task._info['keystone_user'] = json.dumps(
+            getattr(task, 'keystone_user', ""), indent=2)
+        task._info['action_notes'] = json.dumps(
+            getattr(task, 'action_notes', ""), indent=2)
+        task._info['approved_by'] = json.dumps(
+            getattr(task, 'approved_by', ""), indent=2)
     return zip(*six.iteritems(task.to_dict()))
 
 
