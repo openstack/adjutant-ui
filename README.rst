@@ -10,8 +10,7 @@ Adjutant Client can be installed from PyPI using pip:
     pip install python-openstackclient python-adjutantclient
 
 
-The command line client is installed as a plugin for the OpenStack client, and
-an older deprecated version is available under the entry point 'adjutant'.
+The command line client is installed as a plugin for the OpenStack client.
 
 Python API
 ==========
