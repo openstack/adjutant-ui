@@ -34,9 +34,14 @@ editor. You will want to customize several settings:
    OpenStack server to change them.)
 -  ``OPENSTACK_REGISTRATION_URL`` should also be configured to point to
    you Adjutant server and version.
+-  The example Adjutant conf is set with ``USERNAME_IS_EMAIL = True`` and you
+   will want to add that to your local Horizon settings as well unless you've
+   set that to false in Adjutant itself. If the value isn't there, then
+   adjutant-ui defaults to the false case.
 
-You will also need to update the ``keystone_policy.json`` file (openstack_dashboard/conf/keystone_policy.json) in horizon with
-the following lines::
+You will also need to update the ``keystone_policy.json`` file
+(openstack_dashboard/conf/keystone_policy.json) in horizon with the following
+lines::
 
     "project_mod": "role:project_mod",
     "project_admin": "role:project_admin",
