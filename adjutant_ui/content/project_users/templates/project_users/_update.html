@@ -18,7 +18,6 @@
     <p>{% trans "The “Project Admin” role allows users to have full control over your project, including adding moderators and inviting other people to join it." %}</p>
     <p>{% trans "The “Project Moderator” role can invite other people to join your project and update their roles, but cannot change the project admin." %}</p>
     <p>{% trans "The “Project Member” role gives people access to all services on your project, but does not allow them to invite other people to join the project or update roles." %}</p>
-    <p>{% trans "For other roles or more information about access control, please refer to the <a href=\"http://docs.catalystcloud.io/access-control.html\">access control section of the Catalyst Cloud documentation</a>." %}</p>
 </div>
 {% endblock %}
 
@@ -26,4 +25,3 @@
     <button type="submit" class="btn btn-primary">{% trans "Update" %}</button>
     <a href="{% url 'horizon:management:project_users:index' %}" class="btn btn-default secondary cancel pull-left">{% trans "Cancel" %}</a>
 {% endblock %}
-
