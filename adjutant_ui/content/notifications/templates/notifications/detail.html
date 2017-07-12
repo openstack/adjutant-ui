@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load task_filters %}
+{% block title %}{% trans "Notification Details" %}{% endblock %}
+
+{% block page_header %}
+  {% include 'horizon/common/_detail_header.html' %}
+{% endblock %}
+
+{% block main %}
+  <div class="detail">
+    <dl class="dl-horizontal">
+      <dt>{% trans "ID" %}</dt>
+      <dd>{{ notification.uuid }}</dd>
+      <dt>{% trans "Error" %}</dt>
+      <dd>{{ notification.error }}</dd>
+      <dt>{% trans "Notes" %}</dt>
+      <dd>{{ notification.notes }}</dd>
+      <dt>{% trans "Created On" %}</dt>
+      <dd>{{ notification.created_on }}</dd>
+      <dt>{% trans "Acknowleged" %}</dt>
+      <dd>{{ notification.acknowledged }}</dd>
+      <dt>{% trans "Task" %}</dt>
+      <dd><a href="{% url 'horizon:management:tasks:detail' notification.task %}">{{ notification.task }}</a></dd>
+      <dt>{% trans "Task Type" %}</dt>
+      <dd>{{ task.task_type }}</dd>
+      <dt>{% trans "Request By" %}</dt>
+      <dd>{{ task.request_by }}</dd>
+      <dt>{% trans "Task Status" %}</dt>
+      <dd>{{ task.status }}</dd>
+  </div>
+{% endblock %}

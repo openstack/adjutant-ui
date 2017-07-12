@@ -17,7 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 import horizon
 
 
-class TaskList(horizon.Panel):
-    name = _('Admin Tasks')
-    slug = 'tasks'
+class NotificationPanel(horizon.Panel):
+    name = _('Admin Notifications')
+    slug = 'notifications'
     policy_rules = (("identity", "admin_required"),)

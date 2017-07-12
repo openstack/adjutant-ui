@@ -101,6 +101,14 @@ DEFAULT_HIDDEN_QUOTAS = {
     ],
 }
 
+NOTIFICATION = collections.namedtuple('Notification',
+                                      ['uuid', 'notes', 'error', 'created_on',
+                                       'acknowledged', 'task'])
+
+
+class AdjutantApiError(BaseException):
+    pass
+
 
 def _get_endpoint_url(request):
     # If the request is made by an anonymous user, this endpoint request fails.
@@ -333,6 +341,76 @@ def signup_submit(request, data):
         raise
 
 
+def notification_list(request, filters={}, page=1):
+    notifs_per_page = utils.get_page_size(request)
+    headers = {"Content-Type": "application/json",
+               'X-Auth-Token': request.user.token.id}
+
+    response = get(request, 'notifications', headers=headers,
+                   params={'filters': json.dumps(filters), 'page': page,
+                           'notifications_per_page': notifs_per_page})
+    if not response.status_code == 200:
+        if response.json() == {'error': 'Empty page'}:
+            raise AdjutantApiError("Empty Page")
+        raise BaseException
+
+    notificationlist = []
+    for notification in response.json()['notifications']:
+        notificationlist.append(notification_obj_get(
+            request, notification=notification))
+    has_more = response.json()['has_more']
+    has_prev = response.json()['has_prev']
+    return notificationlist, has_prev, has_more
+
+
+def notification_get(request, uuid):
+    headers = {"Content-Type": "application/json",
+               'X-Auth-Token': request.user.token.id}
+
+    response = get(request, 'notifications/%s/' % uuid, headers=headers)
+    return response
+
+
+def notification_obj_get(request, notification_id=None, notification=None):
+    if not notification:
+        notification = notification_get(request, notification_id).json()
+
+    if notification['error']:
+        notes = notification['notes'].get('errors')
+    else:
+        notes = notification['notes'].get('notes')
+
+    if not notes:
+        notes = notification['notes']
+    if isinstance(notes, list) and len(notes) == 1:
+        notes = notes[0]
+
+    if not isinstance(notes, six.text_type):
+        notes = json.dumps(notes)
+
+    return NOTIFICATION(uuid=notification['uuid'],
+                        task=notification['task'],
+                        error=notification['error'],
+                        created_on=notification['created_on'],
+                        acknowledged=notification['acknowledged'],
+                        notes=notes)
+
+
+def notifications_acknowlege(request, notification_id=None):
+    headers = {"Content-Type": "application/json",
+               'X-Auth-Token': request.user.token.id}
+    # Takes either a single notification id or a list of them
+    # and acknowleges all of them
+    if isinstance(notification_id, list):
+        data = {'notifications': notification_id}
+        return post(request, 'notifications', data=json.dumps(data),
+                    headers=headers)
+    else:
+        url = "notifications/%s/" % notification_id
+        return post(request, url, data=json.dumps({'acknowledged': True}),
+                    headers=headers)
+
+
 def task_list(request, filters={}, page=1):
     tasks_per_page = utils.get_page_size(request)
     tasklist = []
@@ -368,7 +446,7 @@ def task_get(request, task_id):
 
 def task_obj_get(request, task_id=None, task=None, page=0):
     if not task:
-        task = task_get(request, task_id)
+        task = task_get(request, task_id).json()
 
     status = "Awaiting Approval"
     if task['cancelled']:
@@ -384,8 +462,8 @@ def task_obj_get(request, task_id=None, task=None, page=0):
             id=task['uuid'],
             task_type=task['task_type'],
             valid=valid,
-            request_by=task['keystone_user'].get('username'),
-            request_project=task['keystone_user'].get('project_name'),
+            request_by=task['keystone_user'].get('username', '-'),
+            request_project=task['keystone_user'].get('project_name', '-'),
             status=status,
             created_on=task['created_on'],
             approved_on=task['approved_on'],

@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _
 
-import horizon
+from django.conf.urls import url
+
+from adjutant_ui.content.notifications import views
 
 
-class TaskList(horizon.Panel):
-    name = _('Admin Tasks')
-    slug = 'tasks'
-    policy_rules = (("identity", "admin_required"),)
+urlpatterns = [
+    url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^(?P<notif_id>[^/]+)/$',
+        views.NotificationDetailView.as_view(), name='detail'),
+]
