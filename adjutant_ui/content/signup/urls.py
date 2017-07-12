@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns
 from django.conf.urls import url
 
 from adjutant_ui.content.signup import views
 
-urlpatterns = patterns(
-    '',
-    url(r'^/?$', views.SignupFormView.as_view(), name='index'),
+urlpatterns = [
+    url(r'^$', views.SignupFormView.as_view(), name='index'),
     url(r'^submitted/?$', views.signup_sent_view, name='submitted'),
-)
+]

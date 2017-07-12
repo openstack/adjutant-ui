@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-from django.conf.urls import patterns
 from django.conf.urls import url
 
 from adjutant_ui.content.token import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^(?P<token>\w+)/?$', views.submit_token_router,
         name='token_verify'),
-)
+]

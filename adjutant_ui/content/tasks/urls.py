@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns
+
 from django.conf.urls import url
 
 from adjutant_ui.content.tasks import views
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^(?P<task_id>[^/]+)/$',
         views.TaskDetailView.as_view(),
         name='detail'),
     url(r'^(?P<task_id>[^/]+)/update/$',
         views.UpdateTaskView.as_view(), name='update'),
     url(r'^$', views.IndexView.as_view(), name='index'),
-)
+]

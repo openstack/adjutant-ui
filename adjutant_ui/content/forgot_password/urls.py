@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns
 from django.conf.urls import url
 
 from adjutant_ui.content.forgot_password import views
 
 # NOTE(adriant): These urls are registered in the project_users urls.py file.
-urlpatterns = patterns(
-    '',
-    url(r'^/?$', views.ForgotPasswordView.as_view(), name='forgot_index'),
+urlpatterns = [
+    url(r'^$', views.ForgotPasswordView.as_view(), name='forgot_index'),
     url(r'^sent/?$', views.password_sent_view, name='forgot_sent'),
-)
+]

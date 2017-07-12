@@ -12,12 +12,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.conf.urls import patterns
 from django.conf.urls import url
 
 from adjutant_ui.content.email import views
 
 
-urlpatterns = patterns(
-    '',
-    url(r'^$', views.EmailView.as_view(), name='index'))
+urlpatterns = [
+    url(r'^$', views.EmailView.as_view(), name='index')
+]
