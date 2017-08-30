@@ -33,7 +33,7 @@ def _logout_msg_response(request, msg):
 
 def _logout_msg_response_success(request, msg):
     response = _logout_msg_response(request, msg)
-    response.set_cookie('logout_reason_class', 'success', max_age=10)
+    response.set_cookie('logout_status', 'success', max_age=10)
     return response
 
 
