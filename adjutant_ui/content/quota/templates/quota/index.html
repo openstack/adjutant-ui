@@ -8,10 +8,11 @@
 
 {% block main %}
 <div class="left">
-    {% include 'management/quota/_index_help.html' %}
   <div id="region-overview">
       {{ region_overview_table.render }}
   </div>
+
+  {% include 'management/quota/_index_help.html' %}
 
   <div id="quota-tasks-overview">
       {{ quota_tasks_table.render }}

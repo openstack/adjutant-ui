@@ -20,4 +20,4 @@ import horizon
 class QuotaPanel(horizon.Panel):
     name = _("Quota Managment")
     slug = 'quota'
-    policy_rules = (('identity', "identity:project_mod_or_admin"),)
+    policy_rules = (('identity', "project_mod_or_admin"),)

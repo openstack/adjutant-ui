@@ -135,7 +135,7 @@ class RegionOverviewTable(tables.DataTable):
                                filters=(to_caps, ))
     preapproved_quotas = tables.Column(
         "preapproved_quotas", filters=(to_caps, ),
-        verbose_name=_("Preapproved Quota Sizes"))
+        verbose_name=_("Preapproved Quota Sizes *"))
 
     class Meta(object):
         name = "region_overview"
