@@ -505,7 +505,7 @@ def size_details_get(request, size, region=None):
                 resource)
             try:
                 percent = float(usage)/value
-            except TypeError:
+            except (TypeError, ZeroDivisionError):
                 percent = '-'
 
             quota_details.append(
@@ -539,7 +539,7 @@ def quota_details_get(request, region):
             usage = resp['regions'][0]['current_usage'][service].get(name)
             try:
                 percent = float(usage)/value
-            except TypeError:
+            except (TypeError, ZeroDivisionError):
                 percent = '-'
 
             size_blob = {}
