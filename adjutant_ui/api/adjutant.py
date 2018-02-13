@@ -570,12 +570,12 @@ def _is_quota_important(service, resource):
 
 
 @memoized.memoized_method
-def _get_quota_information(request, regions=None):
+def _get_quota_information(request, regions=None, include_usage=True):
     headers = {'Content-Type': 'application/json',
                'X-Auth-Token': request.user.token.id}
-    params = {}
+    params = {'include_usage': include_usage}
     if regions:
-        params = {'regions': regions}
+        params['regions'] = regions
     try:
         return get(request, 'openstack/quotas/',
                    params=params, headers=headers).json()
@@ -590,7 +590,7 @@ def quota_sizes_get(request, region=None):
     # Region param is useless here, but nedded for memoized decorator to work
     quota_sizes_dict = {}
 
-    resp = _get_quota_information(request, regions=region)
+    resp = _get_quota_information(request, regions=region, include_usage=False)
 
     for size_name, size in six.iteritems(resp['quota_sizes']):
         quota_sizes_dict[size_name] = QUOTA_SIZE(
@@ -689,7 +689,7 @@ def quota_details_get(request, region):
 def region_quotas_get(request, region=None):
     quota_details = []
 
-    resp = _get_quota_information(request, regions=region)
+    resp = _get_quota_information(request, regions=region, include_usage=False)
 
     data = resp['regions']
     for region_values in data:
@@ -709,7 +709,7 @@ def quota_tasks_get(request, region=None):
     # Region param only used to help with memoized decorator
     quota_tasks = []
 
-    resp = _get_quota_information(request, regions=region)
+    resp = _get_quota_information(request, regions=region, include_usage=False)
 
     for task in resp['active_quota_tasks']:
         quota_tasks.append(
