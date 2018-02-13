@@ -77,7 +77,7 @@ class NotificationTable(tables.DataTable):
                          link=get_task_link)
     error = tables.Column('error', verbose_name=_('Error'))
     created_on = tables.Column('created_on',
-                               verbose_name=_('Request Date'))
+                               verbose_name=_('Created On'))
     notes = tables.Column('notes')
 
     class Meta(object):
