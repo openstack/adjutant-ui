@@ -20,6 +20,7 @@ from six.moves.urllib.parse import urljoin
 import six
 
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from horizon.utils import functions as utils
 from horizon.utils import memoized
@@ -38,6 +39,10 @@ TASK = collections.namedtuple('Task',
                                'request_by', 'request_project',
                                'created_on', 'approved_on', 'page',
                                'completed_on', 'actions', 'status'])
+
+NOTIFICATION = collections.namedtuple('Notification',
+                                      ['uuid', 'notes', 'error', 'created_on',
+                                       'acknowledged', 'task'])
 
 QUOTA_SIZE = collections.namedtuple('QuotaSize',
                                     ['id', 'name', 'cinder',
@@ -67,7 +72,7 @@ QUOTA_TASK = collections.namedtuple(
 # relevant to customers to be shown initially on the update page.
 # These can be overriden in the local_settings file:
 # IMPORTANT_QUOTAS = {<service>: [<quota_name>], }
-DEFAULT_IMPORTANT_QUOTAS = {
+IMPORTANT_QUOTAS = {
     'nova': [
          'instances', 'cores', 'ram',
     ],
@@ -77,6 +82,9 @@ DEFAULT_IMPORTANT_QUOTAS = {
     'neutron': [
          'network', 'floatingip', 'router', 'security_group',
     ],
+    'octavia': [
+         'load_balancer',
+    ],
 }
 
 
@@ -84,7 +92,7 @@ DEFAULT_IMPORTANT_QUOTAS = {
 # Can be overriden in the local_settings file by setting:
 # HIDDEN_QUOTAS = {<service>: [<quota_name>], }
 # or disabled entirely with: HIDDEN_QUOTAS = {}
-DEFAULT_HIDDEN_QUOTAS = {
+HIDDEN_QUOTAS = {
     # these values have long since been deprecated from Nova
     'nova': [
         'security_groups', 'security_group_rules',
@@ -101,9 +109,47 @@ DEFAULT_HIDDEN_QUOTAS = {
     ],
 }
 
-NOTIFICATION = collections.namedtuple('Notification',
-                                      ['uuid', 'notes', 'error', 'created_on',
-                                       'acknowledged', 'task'])
+
+ROLE_TRANSLATIONS = {
+    'project_admin': _('Project Administrator'),
+    'project_mod': _('Project Moderator'),
+    '_member_': _('Project Member'),
+    'Member': _('Project Member'),
+    'heat_stack_owner': _('Heat Stack Owner'),
+    'project_readonly': _('Project Read-only'),
+    'compute_start_stop': _('Compute Start/Stop'),
+    'object_storage': _('Object Storage')
+}
+
+
+def get_role_text(name):
+    # Gets the role text for a given role.
+    # If it doesn't exist will simply return the role name.
+    role_translations = getattr(settings, 'ROLE_TRANSLATIONS', None)
+    if role_translations is None:
+        role_translations = ROLE_TRANSLATIONS
+    if name in role_translations:
+        return role_translations[name].format()
+    return name
+
+
+SERVICE_TRANSLATIONS = {
+    'cinder': _('Volume'),
+    'neutron': _('Networking'),
+    'nova': _('Compute'),
+    'octavia': _('Load Balancer'),
+}
+
+
+def get_service_type(name):
+    # Takes service names and returns a 'nice' name of where they
+    # are from
+    service_translations = getattr(settings, 'SERVICE_TRANSLATIONS', None)
+    if service_translations is None:
+        service_translations = SERVICE_TRANSLATIONS
+    if name in service_translations:
+        return service_translations[name].format()
+    return name
 
 
 class AdjutantApiError(BaseException):
@@ -511,14 +557,14 @@ def task_revalidate(request, task_id):
 def _is_quota_hidden(service, resource):
     hidden_quotas = getattr(settings, 'HIDDEN_QUOTAS', None)
     if hidden_quotas is None:
-        hidden_quotas = DEFAULT_HIDDEN_QUOTAS
+        hidden_quotas = HIDDEN_QUOTAS
     return service in hidden_quotas and resource in hidden_quotas[service]
 
 
 def _is_quota_important(service, resource):
     important_quotas = getattr(settings, 'IMPORTANT_QUOTAS', None)
     if important_quotas is None:
-        important_quotas = DEFAULT_IMPORTANT_QUOTAS
+        important_quotas = IMPORTANT_QUOTAS
     return (
         service in important_quotas and resource in important_quotas[service])
 

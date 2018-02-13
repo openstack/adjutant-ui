@@ -6,19 +6,17 @@
 {% block form_action %}{% url 'horizon:management:project_users:invite' %}{% endblock %}
 
 {% block modal-body %}
-<div class="left">
-  <fieldset>
-    {% include "horizon/common/_form_fields.html" %}
-  </fieldset>
-</div>
-<div class="right">
+  <div class="left">
+    <fieldset>
+      {% include "horizon/common/_form_fields.html" %}
+    </fieldset>
+  </div>
+  <div class="right">
     <h3>{% trans "Description:" %}</h3>
     <p>{% trans "Invite a person to join your project. If the user does not exist they will be emailed instructions to set up their account then automatically added to your project." %}</p>
-    <h4>{% trans "Roles:" %}</h4>
-    <p>{% trans "The “Project Admin” role allows users to have full control over your project, including adding moderators and inviting other people to join it." %}</p>
-    <p>{% trans "The “Project Moderator” role can invite other people to join your project and update their roles, but cannot change the project admin." %}</p>
-    <p>{% trans "The “Project Member” role gives people access to all services on your project, but does not allow them to invite other people to join the project or update roles." %}</p>
-</div>
+
+    {% include 'management/project_users/_role_help.html' %}
+  </div>
 {% endblock %}
 
 {% block modal-footer %}

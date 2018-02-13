@@ -106,8 +106,6 @@ class TaskOverviewTab(tabs.Tab):
     template_name = 'management/tasks/_task_detail_overview.html'
 
     def get_context_data(self, request):
-        print self.tab_group
-        print self.tab_group.kwargs
         return {"task": self.tab_group.kwargs['task']}
 
 

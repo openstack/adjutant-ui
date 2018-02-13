@@ -21,7 +21,6 @@ from horizon import forms
 from horizon import messages
 
 from adjutant_ui.api import adjutant
-from adjutant_ui.content.project_users import utils
 
 
 def get_role_choices(request):
@@ -31,7 +30,7 @@ def get_role_choices(request):
     user can manage.
     """
     role_names = adjutant.valid_role_names_get(request)
-    role_tuples = [(r, utils.get_role_text(r)) for r in role_names]
+    role_tuples = [(r, adjutant.get_role_text(r)) for r in role_names]
     role_tuples = sorted(role_tuples, key=lambda role: role[1])
     return role_tuples
 

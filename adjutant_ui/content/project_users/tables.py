@@ -21,7 +21,6 @@ from horizon import exceptions
 from horizon import tables
 
 from adjutant_ui.api import adjutant
-from adjutant_ui.content.project_users import utils
 
 
 class InviteUser(tables.LinkAction):
@@ -155,7 +154,7 @@ class CohortFilter(tables.FixedFilterAction):
 
 
 def UserRoleDisplayFilter(role_list):
-    roles = [utils.get_role_text(r) for r in role_list]
+    roles = [adjutant.get_role_text(r) for r in role_list]
     return ', '.join(roles)
 
 

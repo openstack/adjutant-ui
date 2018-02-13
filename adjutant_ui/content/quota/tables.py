@@ -35,15 +35,6 @@ def display_as_percent(value):
     return '{:.1%}'.format(value)
 
 
-def service_name(value):
-    # Takes service names and returns a 'nice' name of where they
-    # are from
-    service_name_dict = {'cinder': 'Volume Storage',
-                         'neutron': 'Networking',
-                         'nova': 'Compute'}
-    return service_name_dict.get(value, value)
-
-
 class UpdateQuota(tables.LinkAction):
     name = "update"
     verbose_name = _("Update Quota")
@@ -109,7 +100,7 @@ class UpdateQuotaRow(tables.Row):
 
 class RegionQuotaDetailTable(tables.DataTable):
     service = tables.Column("service", verbose_name=_("Service"),
-                            filters=(service_name, ))
+                            filters=(adjutant.get_service_type, ))
     name = tables.Column(get_quota_name, verbose_name=_("Resource Name"),)
     value = tables.Column("current_quota", verbose_name=_("Resource Quota"), )
     usage = tables.Column("current_usage", verbose_name=_("Current Usage"))
@@ -119,7 +110,7 @@ class RegionQuotaDetailTable(tables.DataTable):
 
 class QuotaDetailUsageTable(tables.DataTable):
     service = tables.Column("service", verbose_name=_("Service"),
-                            filters=(service_name, ))
+                            filters=(adjutant.get_service_type, ))
     name = tables.Column(get_quota_name, verbose_name=_("Resource Name"),)
     value = tables.Column("value", verbose_name=_("Quota Value"), )
     current_quota = tables.Column("current_quota",
@@ -176,7 +167,7 @@ class SizeOverviewTable(tables.DataTable):
 
 class ChangeSizeDisplayTable(tables.DataTable):
     service = tables.Column("service", verbose_name=_("Service"),
-                            filters=(service_name, ),
+                            filters=(adjutant.get_service_type, ),
                             hidden=True)
     name = tables.Column(get_quota_name, verbose_name=_("Resource"),)
     current_quota = tables.Column("current_quota",
