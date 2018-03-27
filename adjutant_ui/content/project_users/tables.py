@@ -162,9 +162,9 @@ class UsersTable(tables.DataTable):
     uid = tables.Column('id', verbose_name=_('User ID'))
     name = tables.Column('name', verbose_name=_('Name'))
     email = tables.Column('email', verbose_name=_('Email'))
-    role = tables.Column('roles',
-                         verbose_name=_('Roles'),
-                         filters=[UserRoleDisplayFilter])
+    roles = tables.Column('roles',
+                          verbose_name=_('Roles'),
+                          filters=[UserRoleDisplayFilter])
     status = tables.Column('status', verbose_name=_('Status'))
     cohort = tables.Column('cohort',
                            verbose_name=_('Member Type'),
@@ -174,7 +174,7 @@ class UsersTable(tables.DataTable):
         name = 'users'
         row_class = UpdateUserRow
         verbose_name = _('Users')
-        columns = ('id', 'name', 'email', 'role', 'status', 'cohort')
+        columns = ('id', 'name', 'email', 'roles', 'status', 'cohort')
         table_actions = (CohortFilter, InviteUser, RevokeUser)
         row_actions = (UpdateUser, ResendInvitation, RevokeUser)
         multi_select = True
