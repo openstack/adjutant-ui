@@ -621,6 +621,8 @@ def size_details_get(request, size, region=None):
     data = resp['quota_sizes'][size]
     region_data = resp['regions'][0]['current_quota']
     for service, values in six.iteritems(data):
+        if service not in resp['regions'][0]['current_usage']:
+            continue
         for resource, value in six.iteritems(values):
             if _is_quota_hidden(service, resource):
                 continue
