@@ -20,7 +20,9 @@ from django.utils.translation import ungettext_lazy
 from horizon import exceptions
 from horizon import tables
 
-from openstack_dashboard.dashboards.admin.defaults.tables import get_quota_name
+from openstack_dashboard.dashboards.admin.defaults.tables import (
+    get_compute_quota_name, get_volume_quota_name, get_network_quota_name
+)
 
 from adjutant_ui.api import adjutant
 
@@ -33,6 +35,17 @@ def display_as_percent(value):
     if value == "-":
         return value
     return '{:.1%}'.format(value)
+
+
+def get_quota_name(quota):
+    if quota.service == "nova":
+        return get_compute_quota_name(quota)
+    if quota.service == "cinder":
+        return get_volume_quota_name(quota)
+    if quota.service == "neutron":
+        return get_network_quota_name(quota)
+
+    return quota.name.replace("_", " ").title()
 
 
 class UpdateQuota(tables.LinkAction):
