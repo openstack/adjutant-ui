@@ -5,7 +5,7 @@
     <h4>{% trans "Action Notes" %}</h4>
     <hr class="header_rule">
     <dl class="dl-horizontal">
-        {% for action, notes in task.action_notes.iteritems %}
+        {% for action, notes in task.action_notes.items %}
           <dt>{{ action }}</dt>
           {% for note in notes %}
             <dd>{{ note }}</dd>
