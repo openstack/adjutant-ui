@@ -592,7 +592,7 @@ def quota_sizes_get(request, region=None):
 
     resp = _get_quota_information(request, regions=region, include_usage=False)
 
-    for size_name, size in six.iteritems(resp['quota_sizes']):
+    for size_name, size in resp['quota_sizes'].items():
         quota_sizes_dict[size_name] = QUOTA_SIZE(
             id=size_name,
             name=size_name,
@@ -620,10 +620,10 @@ def size_details_get(request, size, region=None):
 
     data = resp['quota_sizes'][size]
     region_data = resp['regions'][0]['current_quota']
-    for service, values in six.iteritems(data):
+    for service, values in data.items():
         if service not in resp['regions'][0]['current_usage']:
             continue
-        for resource, value in six.iteritems(values):
+        for resource, value in values.items():
             if _is_quota_hidden(service, resource):
                 continue
 
@@ -655,8 +655,8 @@ def quota_details_get(request, region):
 
     data = resp['regions'][0]['current_quota']
 
-    for service, values in six.iteritems(data):
-        for name, value in six.iteritems(values):
+    for service, values in data.items():
+        for name, value in values.items():
             if _is_quota_hidden(service, name):
                 continue
 
@@ -669,7 +669,7 @@ def quota_details_get(request, region):
                 percent = '-'
 
             size_blob = {}
-            for size_name, size_data in resp['quota_sizes'].iteritems():
+            for size_name, size_data in resp['quota_sizes'].items():
                 size_blob[size_name] = size_data[service].get(name, '-')
 
             if name != 'id':
