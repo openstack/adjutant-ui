@@ -16,8 +16,7 @@ import collections
 import json
 import logging
 import requests
-from six.moves.urllib.parse import urljoin
-import six
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -431,7 +430,7 @@ def notification_obj_get(request, notification_id=None, notification=None):
     if isinstance(notes, list) and len(notes) == 1:
         notes = notes[0]
 
-    if not isinstance(notes, six.text_type):
+    if not isinstance(notes, str):
         notes = json.dumps(notes)
 
     return NOTIFICATION(uuid=notification['uuid'],
