@@ -77,7 +77,7 @@ class ApproveTask(tables.BatchAction):
 
     def action(self, request, obj_id):
         result = adjutant.task_approve(request, obj_id)
-        if not result or result.status_code != 200:
+        if not result or result.status_code not in [200, 202]:
             exception = exceptions.NotAvailable()
             exception._safe_message = False
             raise exception

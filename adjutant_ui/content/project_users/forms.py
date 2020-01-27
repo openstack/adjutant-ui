@@ -56,7 +56,7 @@ class InviteUserForm(forms.SelfHandlingForm):
     def handle(self, request, data):
         try:
             response = adjutant.user_invite(request, data)
-            if response.status_code == 200:
+            if response.status_code == 202:
                 messages.success(request, _('Invited user successfully.'))
             else:
                 messages.error(request, _('Failed to invite user.'))
@@ -100,26 +100,26 @@ class UpdateUserForm(forms.SelfHandlingForm):
             roles_removed = list(current_managable_roles - desired_roles)
 
             # Remove roles from user
-            remove_status = 200
+            remove_status = 202
             if len(roles_removed) > 0:
                 remove_response = adjutant.user_roles_remove(
                     request,
                     user_id,
                     roles_removed)
                 remove_status = remove_response.status_code
-            if remove_status != 200:
+            if remove_status != 202:
                 messages.error(request, _('Failed to remove roles from user.'))
                 return False
 
             # Add new roles
-            added_status = 200
+            added_status = 202
             if len(roles_added) > 0:
                 added_response = adjutant.user_roles_add(
                     request,
                     user_id,
                     roles_added)
                 added_status = added_response.status_code
-            if added_status != 200:
+            if added_status != 202:
                 messages.error(request, _('Failed to add roles to user.'))
                 return False
 

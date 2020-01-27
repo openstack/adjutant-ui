@@ -46,10 +46,8 @@ class UpdateQuotaForm(forms.SelfHandlingForm):
         try:
             response = adjutant.update_quotas(request, data['size'],
                                               regions=[data['region']])
-            if response.status_code == 200:
-                messages.success(request, _('Quota updated sucessfully.'))
-            elif response.status_code == 202:
-                messages.success(request, _('Task created but requires '
+            if response.status_code == 202:
+                messages.success(request, _('Task created and may require '
                                             'admin approval.'))
             elif response.status_code == 400:
                 messages.error(request, _('Failed to update quota. You may'

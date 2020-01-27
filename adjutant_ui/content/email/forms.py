@@ -41,7 +41,7 @@ class EmailForm(forms.SelfHandlingForm):
     def handle(self, request, data):
         try:
             response = api.adjutant.email_update(request, data['new_email'])
-            if response.status_code == 200:
+            if response.status_code == 202:
                 msg = _("Confirmation email sent to %s.")
                 messages.success(request, msg % data['new_email'])
             elif response.status_code == 400:
