@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.core import urlresolvers
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
 
@@ -56,8 +56,8 @@ class AcknowlegeNotifcation(tables.BatchAction):
 
 
 def get_task_link(datum):
-    return urlresolvers.reverse("horizon:management:tasks:detail",
-                                args=(datum.task,))
+    return reverse("horizon:management:tasks:detail",
+                   args=(datum.task,))
 
 
 class ErrorRow(tables.Row):
