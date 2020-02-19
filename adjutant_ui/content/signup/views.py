@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from django.shortcuts import render
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 from horizon import forms
 
