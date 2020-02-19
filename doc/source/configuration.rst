@@ -1,14 +1,14 @@
 Configuring Adjutant-UI
 =======================
 
-Adjutant-ui relies solely on the ``OPENSTACK_REGISTRATION_URL`` setting, as
-much like Keystone's url, this is needed before the user is authenticated and a
+Adjutant-ui relies on the ``OPENSTACK_ADJUTANT_URL`` setting, as much
+like Keystone's url, this is needed before the user is authenticated and a
 valid catalog has been returned. This url is used for the password reset
 functionality, and signup if that panel is turned on.
 
 .. code-block:: python
 
-  OPENSTACK_REGISTRATION_URL = "http://127.0.0.1:5050/v1"
+  OPENSTACK_ADJUTANT_URL = "http://127.0.0.1:5050/v1"
 
 
 Beyond that all the other settings are optional, with reasonably sensible

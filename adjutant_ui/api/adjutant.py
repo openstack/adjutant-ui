@@ -21,6 +21,7 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
+from horizon import exceptions
 from horizon.utils import functions as utils
 from horizon.utils import memoized
 
@@ -159,9 +160,15 @@ def _get_endpoint_url(request):
     # If the request is made by an anonymous user, this endpoint request fails.
     # Thus, we must hardcode this in Horizon.
     if getattr(request.user, "service_catalog", None):
-        url = base.url_for(request, service_type='registration')
+        try:
+            url = base.url_for(request, service_type='admin-logic')
+        except exceptions.ServiceCatalogException:
+            url = base.url_for(request, service_type='registration')
     else:
-        url = getattr(settings, 'OPENSTACK_REGISTRATION_URL')
+        try:
+            url = getattr(settings, 'OPENSTACK_ADJUTANT_URL')
+        except AttributeError:
+            url = getattr(settings, 'OPENSTACK_REGISTRATION_URL')
 
     # Ensure ends in slash
     if not url.endswith('/'):

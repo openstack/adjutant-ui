@@ -19,7 +19,7 @@ Open up the copied ``local_settings.py`` file in your preferred text
 editor. You will want to customize several settings:
 
 -  Verify that the ``OPENSTACK_KEYSTONE_URL`` is correct for your environment.
--  ``OPENSTACK_REGISTRATION_URL`` should also be configured to point to your
+-  ``OPENSTACK_ADJUTANT_URL`` should also be configured to point to your
    Adjutant server and version.
 
 You will also need to update the ``keystone_policy.json`` file in horizon with
