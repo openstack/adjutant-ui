@@ -17,8 +17,8 @@ from django.utils.translation import ugettext_lazy as _
 from horizon import exceptions
 from horizon import tabs
 
-from adjutant_ui.content.tasks import tables as task_tables
 from adjutant_ui.api import adjutant
+from adjutant_ui.content.tasks import tables as task_tables
 
 
 class ActiveTaskListTab(tabs.TableTab):

@@ -74,16 +74,16 @@ QUOTA_TASK = collections.namedtuple(
 # IMPORTANT_QUOTAS = {<service>: [<quota_name>], }
 IMPORTANT_QUOTAS = {
     'nova': [
-         'instances', 'cores', 'ram',
+        'instances', 'cores', 'ram',
     ],
     'cinder': [
         'volumes', 'snapshots', 'gigabytes',
     ],
     'neutron': [
-         'network', 'floatingip', 'router', 'security_group',
+        'network', 'floatingip', 'router', 'security_group',
     ],
     'octavia': [
-         'load_balancer',
+        'load_balancer',
     ],
 }
 
@@ -511,18 +511,18 @@ def task_obj_get(request, task_id=None, task=None, page=0):
     valid = False not in [action['valid'] for
                           action in task['actions']]
     return TASK(
-            id=task['uuid'],
-            task_type=task['task_type'],
-            valid=valid,
-            request_by=task['keystone_user'].get('username', '-'),
-            request_project=task['keystone_user'].get('project_name', '-'),
-            status=status,
-            created_on=task['created_on'],
-            approved_on=task['approved_on'],
-            completed_on=task['completed_on'],
-            actions=task['actions'],
-            page=page
-        )
+        id=task['uuid'],
+        task_type=task['task_type'],
+        valid=valid,
+        request_by=task['keystone_user'].get('username', '-'),
+        request_project=task['keystone_user'].get('project_name', '-'),
+        status=status,
+        created_on=task['created_on'],
+        approved_on=task['approved_on'],
+        completed_on=task['completed_on'],
+        actions=task['actions'],
+        page=page
+    )
 
 
 def task_cancel(request, task_id):
@@ -615,7 +615,7 @@ def quota_sizes_get(request, region=None):
 
 
 def size_details_get(request, size, region=None):
-    """ Gets the current details of the size as well as the current region's
+    """Gets the current details of the size as well as the current region's
     quota
     """
     quota_details = []
@@ -636,7 +636,7 @@ def size_details_get(request, size, region=None):
             usage = resp['regions'][0]['current_usage'][service].get(
                 resource)
             try:
-                percent = float(usage)/value
+                percent = float(usage) / value
             except (TypeError, ZeroDivisionError):
                 percent = '-'
 
@@ -670,7 +670,7 @@ def quota_details_get(request, region):
                 value = 'No Limit'
             usage = resp['regions'][0]['current_usage'][service].get(name)
             try:
-                percent = float(usage)/value
+                percent = float(usage) / value
             except (TypeError, ZeroDivisionError):
                 percent = '-'
 

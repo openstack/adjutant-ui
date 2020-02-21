@@ -20,9 +20,9 @@ from horizon import exceptions
 from horizon import forms
 from horizon import tables as horizon_tables
 
+from adjutant_ui.api import adjutant
 from adjutant_ui.content.quota import forms as quota_forms
 from adjutant_ui.content.quota import tables as quota_tables
-from adjutant_ui.api import adjutant
 
 
 class IndexView(horizon_tables.MultiTableView):

@@ -16,14 +16,14 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
-from horizon import views
 from horizon import tabs
+from horizon import views
 
 from horizon.utils import memoized
 
-from adjutant_ui.content.notifications import tabs as notification_tab
-from adjutant_ui.content.notifications import tables as notification_tables
 from adjutant_ui.api import adjutant
+from adjutant_ui.content.notifications import tables as notification_tables
+from adjutant_ui.content.notifications import tabs as notification_tab
 
 
 class IndexView(tabs.TabbedTableView):

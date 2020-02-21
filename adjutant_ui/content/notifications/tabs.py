@@ -17,9 +17,9 @@ from django.utils.translation import ugettext_lazy as _
 from horizon import exceptions
 from horizon import tabs
 
-from adjutant_ui.content.notifications import tables as notification_tables
 from adjutant_ui.api import adjutant
 from adjutant_ui.api.adjutant import AdjutantApiError
+from adjutant_ui.content.notifications import tables as notification_tables
 
 
 class UnacknowledgedNotificationsTab(tabs.TableTab):
@@ -47,8 +47,8 @@ class UnacknowledgedNotificationsTab(tabs.TableTab):
                 self._page = 1
                 notifications, self._prev, self._more = \
                     adjutant.notification_list(
-                            self.request, filters=self.filters,
-                            page=self._page)
+                        self.request, filters=self.filters,
+                        page=self._page)
             except Exception:
                 exceptions.handle(
                     self.request, _('Failed to list notifications.'))

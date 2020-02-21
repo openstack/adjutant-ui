@@ -21,10 +21,10 @@ from horizon import tabs
 
 from horizon.utils import memoized
 
-from adjutant_ui.content.tasks import tables as task_tables
-from adjutant_ui.content.tasks import forms as task_forms
-from adjutant_ui.content.tasks import tabs as task_tabs
 from adjutant_ui.api import adjutant
+from adjutant_ui.content.tasks import forms as task_forms
+from adjutant_ui.content.tasks import tables as task_tables
+from adjutant_ui.content.tasks import tabs as task_tabs
 
 import json
 
