@@ -27,6 +27,12 @@
 #
 # needs_sphinx = '1.0'
 
+extensions = ['openstackdocstheme']
+
+# Settings for openstackdocstheme
+repository_name = 'openstack/adjutant-ui'
+use_storyboard = True
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -42,7 +48,6 @@ master_doc = 'index'
 # General information about the project.
 project = u'Adjutant-UI'
 copyright = u'2017, Catalyst IT Ltd'
-
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -61,7 +66,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'openstackdocs'
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()

@@ -1,0 +1,2 @@
+libpcre3-dev [platform:dpkg]
+pcre-devel [platform:redhat]
