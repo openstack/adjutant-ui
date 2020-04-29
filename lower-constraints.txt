@@ -23,9 +23,7 @@ enmerkar==0.7.1
 extras==1.0.0
 fasteners==0.14.1
 fixtures==3.0.0
-flake8==2.5.5
 futurist==2.1.0
-hacking==0.12.0
 horizon==18.1.0
 idna==2.9
 imagesize==1.2.0
@@ -39,7 +37,6 @@ jsonschema==3.2.0
 keystoneauth1==3.18.0
 linecache2==1.0.0
 MarkupSafe==1.1.1
-mccabe==0.2.1
 mock==2.0
 monotonic==1.5
 mox3==1.0.0
@@ -65,10 +62,8 @@ oslosphinx==4.7.0
 osprofiler==2.3.0
 packaging==20.3
 pbr==2.0.0
-pep8==1.5.7
 prettytable==0.7.2
 pycparser==2.20
-pyflakes==0.8.1
 Pygments==2.6.1
 pyinotify==0.9.6
 pymongo==3.10.1
