@@ -10,10 +10,10 @@
 hacking>=3.0,<3.1 # Apache-2.0
 coverage>=4.0 # Apache-2.0
 nodeenv>=0.9.4 # BSD
-reno>=1.8.0 # Apache-2.0
+reno>=2.5.0 # Apache-2.0
 selenium>=2.50.1 # Apache-2.0
-sphinx!=1.6.6,!=1.6.7,!=2.1.0,>=1.6.2 # BSD
+sphinx!=2.1.0,>=2.0.0 # BSD
 testtools>=1.4.0 # MIT
 # This also needs xvfb library installed on your OS
 xvfbwrapper>=0.1.3 #license: MIT
-openstackdocstheme>=1.20.0 # Apache-2.0
+openstackdocstheme>=2.0.0 # Apache-2.0

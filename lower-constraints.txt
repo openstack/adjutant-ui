@@ -45,7 +45,7 @@ munch==2.5.0
 netaddr==0.7.19
 netifaces==0.10.9
 nodeenv==0.9.4
-openstackdocstheme==1.20.0
+openstackdocstheme==2.0.0
 openstacksdk==0.43.0
 os-client-config==2.0.0
 os-service-types==1.7.0
@@ -82,7 +82,7 @@ python-swiftclient==3.9.0
 pytz==2019.3
 PyYAML==5.3.1
 rcssmin==1.0.6
-reno==1.8.0
+reno==2.5.0
 requests==2.23.0
 requestsexceptions==1.4.0
 rfc3986==1.3.2
@@ -92,7 +92,7 @@ semantic-version==2.8.4
 simplejson==3.17.0
 six==1.14.0
 snowballstemmer==2.0.0
-Sphinx==1.6.2
+Sphinx==2.0.0
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
 sphinxcontrib-htmlhelp==1.0.3

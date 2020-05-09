@@ -1,5 +1,6 @@
 - project:
     templates:
+      - build-openstack-docs-pti
       - check-requirements
       - horizon-non-primary-django-jobs
       - openstack-cover-jobs-horizon
