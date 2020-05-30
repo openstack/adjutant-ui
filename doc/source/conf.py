@@ -30,8 +30,9 @@
 extensions = ['openstackdocstheme']
 
 # Settings for openstackdocstheme
-repository_name = 'openstack/adjutant-ui'
-use_storyboard = True
+openstackdocs_repo_name = 'openstack/adjutant-ui'
+openstackdocs_auto_name = False
+openstackdocs_use_storyboard = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -55,7 +56,7 @@ copyright = u'2017, Catalyst IT Ltd'
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
