@@ -37,7 +37,6 @@ jsonschema==3.2.0
 keystoneauth1==3.18.0
 linecache2==1.0.0
 MarkupSafe==1.1.1
-mock==2.0
 monotonic==1.5
 mox3==1.0.0
 msgpack==0.6.2
