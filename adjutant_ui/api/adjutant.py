@@ -666,8 +666,12 @@ def quota_details_get(request, region):
             if _is_quota_hidden(service, name):
                 continue
 
-            if value < 0:
-                value = 'No Limit'
+            try:
+                if value < 0:
+                    value = 'No Limit'
+            except (TypeError):
+                pass
+
             usage = resp['regions'][0]['current_usage'][service].get(name)
             try:
                 percent = float(usage)/value
