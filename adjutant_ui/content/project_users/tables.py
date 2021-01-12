@@ -113,7 +113,7 @@ class RevokeUser(tables.DeleteAction):
             # That'll get them out of our project; they keep their account.
             result = adjutant.user_roles_remove(
                 request, user.id, user.roles)
-        if not result or result.status_code != 200:
+        if not result or result.status_code not in [200, 202]:
             exception = exceptions.NotAvailable()
             exception._safe_message = False
             raise exception
