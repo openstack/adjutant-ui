@@ -42,7 +42,7 @@ class CancelTask(tables.DeleteAction):
 
     def delete(self, request, obj_id):
         result = adjutant.task_cancel(request, obj_id)
-        if not result or result.status_code != 200:
+        if not result or result.status_code not in [200, 202]:
             exception = exceptions.NotAvailable()
             exception._safe_message = False
             raise exception
@@ -111,7 +111,7 @@ class ReissueToken(tables.BatchAction):
 
     def action(self, request, obj_id):
         result = adjutant.token_reissue(request, obj_id)
-        if not result or result.status_code != 200:
+        if not result or result.status_code not in [200, 202]:
             exception = exceptions.NotAvailable()
             exception._safe_message = False
             raise exception
@@ -144,7 +144,7 @@ class RevalidateTask(tables.BatchAction):
 
     def action(self, request, obj_id):
         result = adjutant.task_revalidate(request, obj_id)
-        if not result or result.status_code != 200:
+        if not result or result.status_code not in [200, 202]:
             exception = exceptions.NotAvailable()
             exception._safe_message = False
             raise exception
