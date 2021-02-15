@@ -43,7 +43,7 @@ class UpdateTaskForm(forms.SelfHandlingForm):
         try:
             response = adjutant.task_update(
                 request, task_id, data['task_data'])
-            if response.status_code == 200:
+            if response.status_code in [200, 202]:
                 messages.success(request, _('Updated task successfully.'))
             elif response.status_code == 400:
                 messages.error(request, _(response.text))
