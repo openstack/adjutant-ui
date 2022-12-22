@@ -1,11 +1,12 @@
 - project:
+    queue: adjutant-ui
     templates:
       - build-openstack-docs-pti
       - check-requirements
       - horizon-non-primary-django-jobs
       - openstack-cover-jobs-horizon
       - openstack-lower-constraints-jobs-horizon
-      - openstack-python3-wallaby-jobs-horizon
+      - openstack-python3-jobs-horizon
     check:
       jobs:
         - openstack-tox-pep8
