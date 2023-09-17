@@ -5,7 +5,6 @@
       - check-requirements
       - horizon-non-primary-django-jobs
       - openstack-cover-jobs-horizon
-      - openstack-lower-constraints-jobs-horizon
       - openstack-python3-jobs-horizon
     check:
       jobs:
