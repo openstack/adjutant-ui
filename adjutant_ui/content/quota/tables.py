@@ -14,8 +14,8 @@
 
 import json
 
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ungettext_lazy
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from horizon import exceptions
 from horizon import tables
@@ -61,7 +61,7 @@ class CancelQuotaTask(tables.DeleteAction):
 
     @staticmethod
     def action_present(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Cancel Quota Update",
             u"Cancel Quota Updates",
             count
@@ -69,7 +69,7 @@ class CancelQuotaTask(tables.DeleteAction):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Cancelled Quota Update",
             u"Cancelled Quota Updates",
             count

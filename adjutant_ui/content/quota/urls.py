@@ -12,17 +12,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from adjutant_ui.content.quota import views
 
 
 urlpatterns = [
-    url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^region/(?P<region>[^/]+)$', views.RegionDetailView.as_view(),
-        name='region_detail'),
-    url(r'^(?P<region>[^/]+)/update$',
-        views.RegionUpdateView.as_view(), name='update'),
-    url(r'^size/(?P<size>[^/]+)$', views.QuotaSizeView.as_view(),
-        name='size_detail'),
+    re_path(r'^$', views.IndexView.as_view(), name='index'),
+    re_path(r'^region/(?P<region>[^/]+)$', views.RegionDetailView.as_view(),
+            name='region_detail'),
+    re_path(r'^(?P<region>[^/]+)/update$',
+            views.RegionUpdateView.as_view(), name='update'),
+    re_path(r'^size/(?P<size>[^/]+)$', views.QuotaSizeView.as_view(),
+            name='size_detail'),
 ]

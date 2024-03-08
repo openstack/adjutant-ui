@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from adjutant_ui.content.project_users import views
 
 
 urlpatterns = [
-    url(r'^invite/$', views.InviteUserView.as_view(), name='invite'),
-    url(r'^(?P<user_id>[^/]+)/update/$',
-        views.UpdateUserView.as_view(),
-        name='update'),
-    url(r'^$', views.UsersView.as_view(), name='index')
+    re_path(r'^invite/$', views.InviteUserView.as_view(), name='invite'),
+    re_path(r'^(?P<user_id>[^/]+)/update/$',
+            views.UpdateUserView.as_view(),
+            name='update'),
+    re_path(r'^$', views.UsersView.as_view(), name='index')
 ]

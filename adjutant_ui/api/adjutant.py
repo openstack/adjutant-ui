@@ -19,7 +19,7 @@ import requests
 from urllib.parse import urljoin
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from horizon import exceptions
 from horizon.utils import functions as utils

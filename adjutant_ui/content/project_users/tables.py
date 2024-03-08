@@ -14,8 +14,8 @@
 
 from collections import defaultdict
 
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ungettext_lazy
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from horizon import exceptions
 from horizon import tables
@@ -32,7 +32,7 @@ class InviteUser(tables.LinkAction):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Invited User",
             u"Invited Users",
             count
@@ -44,7 +44,7 @@ class ResendInvitation(tables.BatchAction):
 
     @staticmethod
     def action_present(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Resend Invitation",
             u"Resend Invitations",
             count
@@ -52,7 +52,7 @@ class ResendInvitation(tables.BatchAction):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Invitation re-sent",
             u"Invitations re-sent",
             count
@@ -85,7 +85,7 @@ class RevokeUser(tables.DeleteAction):
 
     @staticmethod
     def action_present(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Revoke User",
             u"Revoke Users",
             count
@@ -93,7 +93,7 @@ class RevokeUser(tables.DeleteAction):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Revoked User",
             u"Revoked Users",
             count
