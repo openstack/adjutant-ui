@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ungettext_lazy
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from horizon import exceptions
 from horizon import tables
@@ -26,7 +26,7 @@ class CancelTask(tables.DeleteAction):
 
     @staticmethod
     def action_present(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Cancel Task",
             u"Cancel Tasks",
             count
@@ -34,7 +34,7 @@ class CancelTask(tables.DeleteAction):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Cancelled Task",
             u"Cancelled Tasks",
             count
@@ -61,7 +61,7 @@ class ApproveTask(tables.BatchAction):
 
     @staticmethod
     def action_present(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Approve Task",
             u"Approve Tasks",
             count
@@ -69,7 +69,7 @@ class ApproveTask(tables.BatchAction):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Approved Task",
             u"Approved Tasks",
             count
@@ -95,7 +95,7 @@ class ReissueToken(tables.BatchAction):
 
     @staticmethod
     def action_present(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Reissue Token",
             u"Reissue Tokens",
             count
@@ -103,7 +103,7 @@ class ReissueToken(tables.BatchAction):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Reissued Token",
             u"Reissued Tokens",
             count
@@ -128,7 +128,7 @@ class RevalidateTask(tables.BatchAction):
 
     @staticmethod
     def action_present(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Rerun Validation",
             u"Rerun Validation",
             count
@@ -136,7 +136,7 @@ class RevalidateTask(tables.BatchAction):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Validation run",
             u"Validation run",
             count
@@ -162,7 +162,7 @@ class ReapproveTask(ApproveTask):
 
     @staticmethod
     def action_present(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Reapprove Task",
             u"Reapprove Tasks",
             count
@@ -170,7 +170,7 @@ class ReapproveTask(ApproveTask):
 
     @staticmethod
     def action_past(count):
-        return ungettext_lazy(
+        return ngettext_lazy(
             u"Reapproved Task",
             u"Reapproved Tasks",
             count

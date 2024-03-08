@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from adjutant_ui.content.signup import views
 
 urlpatterns = [
-    url(r'^$', views.SignupFormView.as_view(), name='index'),
-    url(r'^submitted/?$', views.signup_sent_view, name='submitted'),
+    re_path(r'^$', views.SignupFormView.as_view(), name='index'),
+    re_path(r'^submitted/?$', views.signup_sent_view, name='submitted'),
 ]

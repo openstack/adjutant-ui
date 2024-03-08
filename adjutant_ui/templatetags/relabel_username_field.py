@@ -15,7 +15,7 @@
 
 from django.conf import settings
 from django import template
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 register = template.Library()
 
@@ -34,7 +34,7 @@ def relabel_username_field(context):
     if (hasattr(settings, 'USERNAME_IS_EMAIL') and
             getattr(settings, 'USERNAME_IS_EMAIL')):
         try:
-            context['form'].fields['username'].label = ugettext_lazy('Email')
+            context['form'].fields['username'].label = gettext_lazy('Email')
         except Exception:
             pass
     return u""
