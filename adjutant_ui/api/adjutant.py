@@ -625,20 +625,24 @@ def size_details_get(request, size, region=None):
     resp = _get_quota_information(request, regions=region)
 
     data = resp['quota_sizes'][size]
-    region_data = resp['regions'][0]['current_quota']
+    try:
+        region = resp['regions'][0]
+    except IndexError:
+        region = {}
+    current_quota = region.get('current_quota', {})
+    current_usage = region.get('current_usage', {})
     for service, values in data.items():
-        if service not in resp['regions'][0]['current_usage']:
-            continue
         for resource, value in values.items():
             if _is_quota_hidden(service, resource):
                 continue
 
-            usage = resp['regions'][0]['current_usage'][service].get(
-                resource)
-            try:
-                percent = float(usage) / value
-            except (TypeError, ZeroDivisionError):
-                percent = '-'
+            quota = current_quota.get(service, {}).get(resource, '-')
+            usage = current_usage.get(service, {}).get(resource, '-')
+            percent = (
+                '-'
+                if not value or usage == '-'
+                else (usage / value)
+            )
 
             quota_details.append(
                 SIZE_QUOTA_VALUE(
@@ -646,7 +650,7 @@ def size_details_get(request, size, region=None):
                     name=resource,
                     service=service,
                     value=value,
-                    current_quota=region_data[service][resource],
+                    current_quota=quota,
                     current_usage=usage,
                     percent=percent
                 )
@@ -659,7 +663,11 @@ def quota_details_get(request, region):
 
     resp = _get_quota_information(request, regions=region)
 
-    data = resp['regions'][0]['current_quota']
+    try:
+        region = resp['regions'][0]
+    except IndexError:
+        region = {}
+    data = region.get('current_quota', {})
 
     for service, values in data.items():
         for name, value in values.items():

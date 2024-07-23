@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %} {% trans "Quota Details" %} {% endblock %}
+{% block title %}{% blocktrans %}{{ region }} Quota Details{% endblocktrans %}{% endblock %}
 
 {% block main %}
   {{ table.render }}

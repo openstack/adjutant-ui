@@ -57,7 +57,7 @@ class IndexView(horizon_tables.MultiTableView):
 class RegionDetailView(horizon_tables.DataTableView):
     table_class = quota_tables.RegionQuotaDetailTable
     template_name = 'management/quota/region_detail.html'
-    page_title = _("'{{ region }}' Quota Details")
+    page_title = _("{{ region }} Quota Details")
 
     def get_data(self):
         try:
@@ -76,7 +76,7 @@ class RegionDetailView(horizon_tables.DataTableView):
 class QuotaSizeView(horizon_tables.DataTableView):
     table_class = quota_tables.QuotaDetailUsageTable
     template_name = 'management/quota/size_detail.html'
-    page_title = _("'{{ size }}' Quota Details")
+    page_title = _("{{ size | title }} Quota Details")
 
     def get_data(self):
         try:
@@ -89,8 +89,10 @@ class QuotaSizeView(horizon_tables.DataTableView):
     def get_context_data(self, **kwargs):
         # request.user.services_region
         context = super(QuotaSizeView, self).get_context_data(**kwargs)
-        context['title'] = _("%s - Quota Details") \
-            % self.kwargs['size'].title()
+        context['size'] = self.kwargs['size']
+        # NOTE(callumdickinson): Necessary because the title filter
+        # is overloaded in the title block.
+        context['size_titlecase'] = self.kwargs['size'].title()
         return context
 
 
