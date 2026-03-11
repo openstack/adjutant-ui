@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import setuptools
+from setuptools import setup
 
-setuptools.setup(
-    setup_requires=['pbr>=1.8'],
-    pbr=True)
+setup(
+    setup_requires=["pbr"],
+    pbr=True,
+)
