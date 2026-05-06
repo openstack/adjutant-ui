@@ -29,16 +29,16 @@ class AcknowlegeNotifcation(tables.BatchAction):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Acknowlege Notification",
-            u"Acknowlege Notifications",
+            "Acknowlege Notification",
+            "Acknowlege Notifications",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Acknowleged Notification",
-            u"Acknowleged Notifications",
+            "Acknowleged Notification",
+            "Acknowleged Notifications",
             count
         )
 
@@ -51,7 +51,7 @@ class AcknowlegeNotifcation(tables.BatchAction):
 
     def allowed(self, request, notification=None):
         if notification:
-            return not(notification.acknowledged)
+            return not (notification.acknowledged)
         return True
 
 

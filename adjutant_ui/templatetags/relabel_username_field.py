@@ -37,4 +37,4 @@ def relabel_username_field(context):
             context['form'].fields['username'].label = gettext_lazy('Email')
         except Exception:
             pass
-    return u""
+    return ""

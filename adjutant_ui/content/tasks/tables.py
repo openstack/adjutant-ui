@@ -27,16 +27,16 @@ class CancelTask(tables.DeleteAction):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Cancel Task",
-            u"Cancel Tasks",
+            "Cancel Task",
+            "Cancel Tasks",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Cancelled Task",
-            u"Cancelled Tasks",
+            "Cancelled Task",
+            "Cancelled Tasks",
             count
         )
 
@@ -49,7 +49,7 @@ class CancelTask(tables.DeleteAction):
 
     def allowed(self, request, task=None):
         if task:
-            return not(
+            return not (
                 task.status == "Completed" or task.status == "Cancelled")
         return True
 
@@ -62,16 +62,16 @@ class ApproveTask(tables.BatchAction):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Approve Task",
-            u"Approve Tasks",
+            "Approve Task",
+            "Approve Tasks",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Approved Task",
-            u"Approved Tasks",
+            "Approved Task",
+            "Approved Tasks",
             count
         )
 
@@ -84,7 +84,7 @@ class ApproveTask(tables.BatchAction):
 
     def allowed(self, request, task=None):
         if task:
-            return task.valid and not(
+            return task.valid and not (
                 task.status == "Completed" or task.status == "Cancelled")
         return True
 
@@ -96,16 +96,16 @@ class ReissueToken(tables.BatchAction):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Reissue Token",
-            u"Reissue Tokens",
+            "Reissue Token",
+            "Reissue Tokens",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Reissued Token",
-            u"Reissued Tokens",
+            "Reissued Token",
+            "Reissued Tokens",
             count
         )
 
@@ -129,16 +129,16 @@ class RevalidateTask(tables.BatchAction):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Rerun Validation",
-            u"Rerun Validation",
+            "Rerun Validation",
+            "Rerun Validation",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Validation run",
-            u"Validation run",
+            "Validation run",
+            "Validation run",
             count
         )
 
@@ -163,16 +163,16 @@ class ReapproveTask(ApproveTask):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Reapprove Task",
-            u"Reapprove Tasks",
+            "Reapprove Task",
+            "Reapprove Tasks",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Reapproved Task",
-            u"Reapproved Tasks",
+            "Reapproved Task",
+            "Reapproved Tasks",
             count
         )
 
