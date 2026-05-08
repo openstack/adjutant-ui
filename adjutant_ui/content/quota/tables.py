@@ -62,16 +62,16 @@ class CancelQuotaTask(tables.DeleteAction):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Cancel Quota Update",
-            u"Cancel Quota Updates",
+            "Cancel Quota Update",
+            "Cancel Quota Updates",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Cancelled Quota Update",
-            u"Cancelled Quota Updates",
+            "Cancelled Quota Update",
+            "Cancelled Quota Updates",
             count
         )
 

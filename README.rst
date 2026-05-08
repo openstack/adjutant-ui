@@ -2,6 +2,8 @@
 adjutant-ui
 ===========
 
+.. image:: https://governance.openstack.org/tc/badges/adjutant-ui.svg
+
 Adjutant Dashboard
 
 * Free software: Apache license
@@ -9,7 +11,6 @@ Adjutant Dashboard
 
 This is the Horizon plugin for the Adjutant service, and provides UI elements
 to the core features that Adjutant adds.
-
 
 Documentation
 =============

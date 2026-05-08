@@ -33,8 +33,8 @@ class InviteUser(tables.LinkAction):
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Invited User",
-            u"Invited Users",
+            "Invited User",
+            "Invited Users",
             count
         )
 
@@ -45,16 +45,16 @@ class ResendInvitation(tables.BatchAction):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Resend Invitation",
-            u"Resend Invitations",
+            "Resend Invitation",
+            "Resend Invitations",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Invitation re-sent",
-            u"Invitations re-sent",
+            "Invitation re-sent",
+            "Invitations re-sent",
             count
         )
 
@@ -86,16 +86,16 @@ class RevokeUser(tables.DeleteAction):
     @staticmethod
     def action_present(count):
         return ngettext_lazy(
-            u"Revoke User",
-            u"Revoke Users",
+            "Revoke User",
+            "Revoke Users",
             count
         )
 
     @staticmethod
     def action_past(count):
         return ngettext_lazy(
-            u"Revoked User",
-            u"Revoked Users",
+            "Revoked User",
+            "Revoked Users",
             count
         )
 
