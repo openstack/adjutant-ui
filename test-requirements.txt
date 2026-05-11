@@ -1,9 +1,9 @@
 # Hacking already pins down pep8, pyflakes and flake8
-hacking>=7.0.0,<7.1.0 # Apache-2.0
+hacking>=8.0.0,<8.1.0 # Apache-2.0
 
 coverage>=4.0 # Apache-2.0
 nodeenv>=0.9.4 # BSD
 selenium>=2.50.1 # Apache-2.0
 testtools>=1.4.0 # MIT
 # This also needs xvfb library installed on your OS
-xvfbwrapper>=0.1.3 #license: MIT
+xvfbwrapper>=0.2.20 # MIT
