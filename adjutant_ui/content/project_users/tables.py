@@ -153,18 +153,21 @@ class CohortFilter(tables.FixedFilterAction):
         return categorized_users
 
 
-def UserRoleDisplayFilter(role_list):
-    roles = [adjutant.get_role_text(r) for r in role_list]
-    return ', '.join(roles)
+def get_roles_display(user):
+    parts = [adjutant.get_role_text(r) for r in (user.roles or [])]
+    for gr in (user.group_roles or []):
+        parts.append(
+            f"{adjutant.get_role_text(gr['role'])} [{gr['group_name']}]"
+        )
+    return ', '.join(parts)
 
 
 class UsersTable(tables.DataTable):
     uid = tables.Column('id', verbose_name=_('User ID'))
     name = tables.Column('name', verbose_name=_('Name'))
     email = tables.Column('email', verbose_name=_('Email'))
-    roles = tables.Column('roles',
-                          verbose_name=_('Roles'),
-                          filters=[UserRoleDisplayFilter])
+    roles = tables.Column(get_roles_display,
+                          verbose_name=_('Roles'))
     status = tables.Column('status', verbose_name=_('Status'))
     cohort = tables.Column('cohort',
                            verbose_name=_('Member Type'),

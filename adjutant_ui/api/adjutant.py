@@ -30,7 +30,7 @@ from openstack_dashboard.api import base
 LOG = logging.getLogger(__name__)
 USER = collections.namedtuple('User',
                               ['id', 'name', 'email',
-                               'roles', 'cohort', 'status'])
+                               'roles', 'group_roles', 'cohort', 'status'])
 TOKEN = collections.namedtuple('Token',
                                ['action'])
 
@@ -115,6 +115,7 @@ ROLE_TRANSLATIONS = {
     'project_mod': _('Project Moderator'),
     '_member_': _('Project Member'),
     'Member': _('Project Member'),
+    'member': _('Project Member'),
     'heat_stack_owner': _('Heat Stack Owner'),
     'project_readonly': _('Project Read-only'),
     'compute_start_stop': _('Compute Start/Stop'),
@@ -237,6 +238,7 @@ def user_list(request):
                     name=user['name'],
                     email=user['email'],
                     roles=user['roles'],
+                    group_roles=user.get('group_roles', []),
                     status=user['status'],
                     cohort=user['cohort']
                 )
