@@ -135,10 +135,12 @@ def get_role_text(name):
 
 
 SERVICE_TRANSLATIONS = {
+    'aodh': _('Alarm'),
     'cinder': _('Volume'),
     'neutron': _('Networking'),
     'nova': _('Compute'),
     'octavia': _('Load Balancer'),
+    'trove': _('Database'),
 }
 
 
