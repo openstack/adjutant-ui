@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    The Project Users dashboard now displays role assignments for users from
+    user groups, if they are members of user groups and inherit any role
+    assignments from them.
